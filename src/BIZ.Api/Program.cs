@@ -1,30 +1,36 @@
-using BIZ.Infrastructure.Persistence.MasterRegistry;
-using Microsoft.EntityFrameworkCore;
+using BIZ.Api.Middleware;
 using BIZ.Application.Interfaces;
+using BIZ.Infrastructure.Persistence.MasterRegistry;
 using BIZ.Infrastructure.Tenant;
+using Microsoft.EntityFrameworkCore;
+using BIZ.Infrastructure.Persistence.Tenant;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ============================================================
 // Services
 // ============================================================
-builder.Services.AddScoped<ITenantContext, TenantContext>();
 
-// Controllers
 builder.Services.AddControllers();
 
-// Swagger / OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddDbContext<TenantDbContext>();
 
 // ============================================================
-// Database
+// Master Registry Database
 // ============================================================
 
 builder.Services.AddDbContext<MasterRegistryDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("MasterRegistry")
     ));
+
+// ============================================================
+// Tenant Context
+// ============================================================
+
+builder.Services.AddScoped<ITenantContext, TenantContext>();
 
 // ============================================================
 // Application
@@ -43,6 +49,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Tenant resolution MUST happen before controllers
+app.UseMiddleware<TenantResolutionMiddleware>();
 
 app.UseAuthorization();
 
