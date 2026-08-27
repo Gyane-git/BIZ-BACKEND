@@ -1,31 +1,38 @@
-using BIZ.Infrastructure.Persistence.Tenant;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace BIZ.Api.Controllers;
 
 [ApiController]
-[Route("api/tenant-test")]
+[Route("api/[controller]")]
 public class TenantTestController : ControllerBase
 {
-    private readonly TenantDbContext _db;
-
-    public TenantTestController(TenantDbContext db)
-    {
-        _db = db;
-    }
-
+    [Authorize]
     [HttpGet]
-    public async Task<IActionResult> Get()
+    public IActionResult Get()
     {
-        var data = await _db.TenantTests
-            .AsNoTracking()
-            .ToListAsync();
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var username = User.FindFirstValue(ClaimTypes.Name);
+        var companyId = User.FindFirstValue("companyId");
+        var companyCode = User.FindFirstValue("companyCode");
+        var companyName = User.FindFirstValue("companyName");
 
         return Ok(new
         {
-            database = _db.Database.GetDbConnection().Database,
-            data
+            success = true,
+            message = "JWT authentication successful.",
+            user = new
+            {
+                userId,
+                username
+            },
+            tenant = new
+            {
+                companyId,
+                companyCode,
+                companyName
+            }
         });
     }
 }

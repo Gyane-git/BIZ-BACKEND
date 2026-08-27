@@ -13,6 +13,8 @@ public class MasterRegistryDbContext : DbContext
 
     public DbSet<Company> Companies => Set<Company>();
 
+    public DbSet<User> Users => Set<User>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -47,6 +49,43 @@ public class MasterRegistryDbContext : DbContext
 
             entity.Property(x => x.CreatedAt)
                 .IsRequired();
+        });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.ToTable("Users");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Username)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.Property(x => x.PasswordHash)
+                .IsRequired()
+                .HasMaxLength(255);
+
+            entity.Property(x => x.FullName)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            entity.Property(x => x.IsActive)
+                .IsRequired();
+
+            entity.Property(x => x.CreatedAt)
+                .IsRequired();
+
+            entity.HasIndex(x => new
+            {
+                x.CompanyId,
+                x.Username
+            })
+            .IsUnique();
+
+            entity.HasOne(x => x.Company)
+                .WithMany()
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }
