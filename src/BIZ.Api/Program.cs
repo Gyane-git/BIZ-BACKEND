@@ -84,6 +84,10 @@ builder.Services.AddDbContext<TenantDbContext>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IBranchService, BranchService>();
+builder.Services.AddScoped<ICompanyUnitService, CompanyUnitService>();
+builder.Services.AddScoped<IUnitService, UnitService>();
+builder.Services.AddScoped<IUnitConversionService, UnitConversionService>();
+builder.Services.AddScoped<IProductCategoryService, ProductCategoryService>();
 
 // ============================================================
 // Master Registry Database
