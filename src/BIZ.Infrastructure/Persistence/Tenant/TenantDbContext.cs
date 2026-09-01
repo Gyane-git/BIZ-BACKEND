@@ -16,7 +16,17 @@ public class TenantDbContext : DbContext
         _tenantContext = tenantContext;
     }
 
+    // ============================================================
+    // Tenant Tables
+    // ============================================================
+
     public DbSet<TenantTest> TenantTests => Set<TenantTest>();
+
+    public DbSet<Branch> Branches => Set<Branch>();
+
+    // ============================================================
+    // Database Configuration
+    // ============================================================
 
     protected override void OnConfiguring(
         DbContextOptionsBuilder optionsBuilder)
@@ -40,5 +50,51 @@ public class TenantDbContext : DbContext
             $"Encrypt=False";
 
         optionsBuilder.UseSqlServer(connectionString);
+    }
+
+    // ============================================================
+    // Entity Configurations
+    // ============================================================
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        // ========================================================
+        // Branch
+        // ========================================================
+
+        modelBuilder.Entity<Branch>(entity =>
+        {
+            entity.ToTable("Branches");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Code)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            entity.HasIndex(x => x.Code)
+                .IsUnique();
+
+            entity.Property(x => x.Name)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            entity.Property(x => x.Address)
+                .HasMaxLength(500);
+
+            entity.Property(x => x.Phone)
+                .HasMaxLength(50);
+
+            entity.Property(x => x.Email)
+                .HasMaxLength(200);
+
+            entity.Property(x => x.IsActive)
+                .IsRequired();
+
+            entity.Property(x => x.CreatedAt)
+                .IsRequired();
+        });
     }
 }

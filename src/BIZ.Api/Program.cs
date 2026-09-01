@@ -83,6 +83,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<TenantDbContext>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IBranchService, BranchService>();
 
 // ============================================================
 // Master Registry Database
