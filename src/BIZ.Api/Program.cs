@@ -104,6 +104,13 @@ builder.Services.AddScoped<IProductUnitService, ProductUnitService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductBarcodeService,ProductBarcodeService>();
 builder.Services.AddScoped<IProductImageService,ProductImageService>();
+builder.Services.AddScoped<IProductAttributeService,ProductAttributeService>();
+builder.Services.AddScoped<IProductVariantService, ProductVariantService>();
+builder.Services.AddScoped<IProductBatchService,ProductBatchService>();
+builder.Services.AddScoped<IProductSerialService,ProductSerialService>();
+builder.Services.AddScoped<IAccountGroupService, AccountGroupService>();
+builder.Services.AddScoped<IAccountSubGroupService, AccountSubGroupService>();
+
 
 
 

@@ -65,12 +65,11 @@ public class Product
     public DateTime? UpdatedAt { get; set; }
 
     // Navigation
-    public ICollection<ProductUnit> ProductUnits { get; set; }
-        = new List<ProductUnit>();
-
-    public ICollection<ProductBarcode> ProductBarcodes { get; set; }
-    = new List<ProductBarcode>();
-    
-    public ICollection<ProductImage> ProductImages { get; set; }
-    = new List<ProductImage>();
+    public ICollection<ProductUnit> ProductUnits { get; set; } = new List<ProductUnit>();
+    public ICollection<ProductBarcode> ProductBarcodes { get; set; } = new List<ProductBarcode>();
+    public ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();
+    public ICollection<ProductAttribute> ProductAttributes { get; set; } = new List<ProductAttribute>();
+    public ICollection<ProductVariant> ProductVariants { get; set; } = new List<ProductVariant>();
+    public ICollection<ProductBatch> ProductBatches { get; set; }= new List<ProductBatch>();
+    public ICollection<ProductSerial> ProductSerials { get; set; } = new List<ProductSerial>();
 }

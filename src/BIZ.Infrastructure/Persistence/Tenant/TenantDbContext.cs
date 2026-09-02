@@ -47,6 +47,15 @@ public class TenantDbContext : DbContext
     public DbSet<ProductUnit> ProductUnits => Set<ProductUnit>();
     public DbSet<ProductBarcode> ProductBarcodes => Set<ProductBarcode>();
     public DbSet<ProductImage> ProductImages => Set<ProductImage>();
+    public DbSet<ProductAttribute> ProductAttributes => Set<ProductAttribute>();
+    public DbSet<ProductVariant> ProductVariants => Set<ProductVariant>();
+    public DbSet<ProductBatch> ProductBatches => Set<ProductBatch>();
+    public DbSet<ProductSerial> ProductSerials=> Set<ProductSerial>();
+
+    public DbSet<AccountGroup> AccountGroups => Set<AccountGroup>();
+    public DbSet<AccountSubGroup> AccountSubGroups => Set<AccountSubGroup>();
+
+
 
     // ============================================================
     // Database Configuration
@@ -1148,6 +1157,288 @@ modelBuilder.Entity<ProductUnit>(entity =>
         .HasForeignKey(x => x.ProductId)
         .OnDelete(DeleteBehavior.Restrict);
 });
+
+// ========================================================
+        // ProductAttribute
+        // ========================================================
+        modelBuilder.Entity<ProductAttribute>(entity =>
+{
+    entity.ToTable("ProductAttributes");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.AttributeName)
+        .IsRequired()
+        .HasMaxLength(100);
+
+    entity.Property(x => x.AttributeValue)
+        .IsRequired()
+        .HasMaxLength(500);
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasIndex(x => new
+    {
+        x.ProductId,
+        x.AttributeName
+    })
+    .IsUnique();
+
+    entity.HasOne(x => x.Product)
+        .WithMany(x => x.ProductAttributes)
+        .HasForeignKey(x => x.ProductId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+        // ========================================================
+        // ProductVariant
+        // ========================================================
+        modelBuilder.Entity<ProductVariant>(entity =>
+{
+    entity.ToTable("ProductVariants");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.VariantCode)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.VariantCode)
+        .IsUnique();
+
+    entity.Property(x => x.VariantName)
+        .IsRequired()
+        .HasMaxLength(200);
+
+    entity.Property(x => x.Color)
+        .HasMaxLength(100);
+
+    entity.Property(x => x.Size)
+        .HasMaxLength(100);
+
+    entity.Property(x => x.Specification)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.PurchaseRate)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.SalesRate)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.MRP)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.DealerPrice)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.DiscountRate)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.ReorderLevel)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.ReorderQty)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.Product)
+        .WithMany(x => x.ProductVariants)
+        .HasForeignKey(x => x.ProductId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+   // ========================================================
+        // ProductBatch
+        // ========================================================
+       modelBuilder.Entity<ProductBatch>(entity =>
+{
+    entity.ToTable("ProductBatches");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.BatchNumber)
+        .IsRequired()
+        .HasMaxLength(100);
+
+    entity.HasIndex(x => new
+    {
+        x.ProductId,
+        x.BatchNumber
+    })
+    .IsUnique();
+
+    entity.Property(x => x.OpeningQuantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.CurrentQuantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.PurchaseRate)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.SalesRate)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.MRP)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.Product)
+        .WithMany(x => x.ProductBatches)
+        .HasForeignKey(x => x.ProductId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.ProductVariant)
+        .WithMany()
+        .HasForeignKey(x => x.ProductVariantId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+
+// ========================================================
+        // ProductSerial
+        // ========================================================
+       modelBuilder.Entity<ProductSerial>(entity =>
+{
+    entity.ToTable("ProductSerials");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.SerialNumber)
+        .IsRequired()
+        .HasMaxLength(100);
+
+    entity.HasIndex(x => x.SerialNumber)
+        .IsUnique();
+
+    entity.Property(x => x.PurchaseRate)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.SalesRate)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.Status)
+        .IsRequired()
+        .HasMaxLength(30);
+
+    entity.Property(x => x.Remarks)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.Product)
+        .WithMany(x => x.ProductSerials)
+        .HasForeignKey(x => x.ProductId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.ProductVariant)
+        .WithMany()
+        .HasForeignKey(x => x.ProductVariantId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.ProductBatch)
+        .WithMany()
+        .HasForeignKey(x => x.ProductBatchId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+
+
+// ========================================================
+        // AccountGroup
+        // ========================================================
+        modelBuilder.Entity<AccountGroup>(entity =>
+{
+    entity.ToTable("AccountGroups");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.Code)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.Code)
+        .IsUnique();
+
+    entity.Property(x => x.Name)
+        .IsRequired()
+        .HasMaxLength(200);
+
+    entity.HasIndex(x => x.Name)
+        .IsUnique();
+
+    entity.Property(x => x.Nature)
+        .IsRequired()
+        .HasMaxLength(30);
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+});
+  // ========================================================
+        // AccountSubGroup
+        // ========================================================
+        modelBuilder.Entity<AccountSubGroup>(entity =>
+{
+    entity.ToTable("AccountSubGroups");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.Code)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.Code)
+        .IsUnique();
+
+    entity.Property(x => x.Name)
+        .IsRequired()
+        .HasMaxLength(200);
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.AccountGroup)
+        .WithMany(x => x.AccountSubGroups)
+        .HasForeignKey(x => x.AccountGroupId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+
+
+
+
 
 
     }
