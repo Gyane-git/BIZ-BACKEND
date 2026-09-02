@@ -88,6 +88,20 @@ builder.Services.AddScoped<ICompanyUnitService, CompanyUnitService>();
 builder.Services.AddScoped<IUnitService, UnitService>();
 builder.Services.AddScoped<IUnitConversionService, UnitConversionService>();
 builder.Services.AddScoped<IProductCategoryService, ProductCategoryService>();
+builder.Services.AddScoped<IProductGroupService, ProductGroupService>();
+builder.Services.AddScoped<IProductSubGroupService, ProductSubGroupService>();
+builder.Services.AddScoped<IBrandService, BrandService>();
+builder.Services.AddScoped<IModelService, ModelService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<IAgentService, AgentService>();
+builder.Services.AddScoped<IWarehouseService, WarehouseService>();
+builder.Services.AddScoped<IWarehouseLocationService,WarehouseLocationService>();
+builder.Services.AddScoped<IRackService, RackService>();
+builder.Services.AddScoped<ICurrencyService, CurrencyService>();
+builder.Services.AddScoped<ICurrencyRateService,CurrencyRateService>();
+
+
 
 // ============================================================
 // Master Registry Database

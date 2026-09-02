@@ -4,6 +4,7 @@ using BIZ.Infrastructure.Persistence.Tenant;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260902053224_AddWarehouseAndWarehouseLocation")]
+    partial class AddWarehouseAndWarehouseLocation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -251,99 +254,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                         .IsUnique();
 
                     b.ToTable("CompanyUnits", (string)null);
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.Currency", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsBaseCurrency")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Symbol")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique();
-
-                    b.ToTable("Currencies", (string)null);
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.CurrencyRate", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal?>("AverageRate")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<decimal>("BuyingRate")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CurrencyId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("RateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Remarks")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<decimal>("SellingRate")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CurrencyId", "RateDate")
-                        .IsUnique();
-
-                    b.ToTable("CurrencyRates", (string)null);
                 });
 
             modelBuilder.Entity("BIZ.Domain.Entities.Customer", b =>
@@ -646,50 +556,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                         .IsUnique();
 
                     b.ToTable("ProductSubGroups", (string)null);
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.Rack", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("WarehouseId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique();
-
-                    b.HasIndex("WarehouseId");
-
-                    b.ToTable("Racks", (string)null);
                 });
 
             modelBuilder.Entity("BIZ.Domain.Entities.Region", b =>
@@ -1008,17 +874,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                     b.ToTable("WarehouseLocations", (string)null);
                 });
 
-            modelBuilder.Entity("BIZ.Domain.Entities.CurrencyRate", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.Currency", "Currency")
-                        .WithMany("CurrencyRates")
-                        .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Currency");
-                });
-
             modelBuilder.Entity("BIZ.Domain.Entities.Model", b =>
                 {
                     b.HasOne("BIZ.Domain.Entities.Brand", "Brand")
@@ -1039,16 +894,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                         .IsRequired();
 
                     b.Navigation("ProductGroup");
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.Rack", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.Warehouse", "Warehouse")
-                        .WithMany()
-                        .HasForeignKey("WarehouseId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Warehouse");
                 });
 
             modelBuilder.Entity("BIZ.Domain.Entities.UnitConversion", b =>
@@ -1084,11 +929,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
             modelBuilder.Entity("BIZ.Domain.Entities.Brand", b =>
                 {
                     b.Navigation("Models");
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.Currency", b =>
-                {
-                    b.Navigation("CurrencyRates");
                 });
 
             modelBuilder.Entity("BIZ.Domain.Entities.ProductGroup", b =>
