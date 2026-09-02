@@ -1,5 +1,6 @@
 using BIZ.Application.DTOs;
 using BIZ.Application.Interfaces;
+using BIZ.Domain.Entities;
 using BIZ.Infrastructure.Persistence.Tenant;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,17 +8,19 @@ namespace BIZ.Infrastructure.Services;
 
 public class ProductUnitService : IProductUnitService
 {
-    private readonly TenantDbContext _context;
+    private readonly TenantDbContext _db;
 
-    public ProductUnitService(TenantDbContext context)
+    public ProductUnitService(TenantDbContext db)
     {
-        _context = context;
+        _db = db;
     }
 
     public async Task<List<ProductUnitDto>> GetAllAsync()
     {
-        return await _context.ProductUnits
+        return await _db.ProductUnits
             .AsNoTracking()
+            .OrderBy(x => x.ProductId)
+            .ThenBy(x => x.UnitId)
             .Select(x => new ProductUnitDto
             {
                 Id = x.Id,
@@ -37,9 +40,10 @@ public class ProductUnitService : IProductUnitService
 
     public async Task<List<ProductUnitDto>> GetByProductAsync(int productId)
     {
-        return await _context.ProductUnits
+        return await _db.ProductUnits
             .AsNoTracking()
             .Where(x => x.ProductId == productId)
+            .OrderBy(x => x.UnitId)
             .Select(x => new ProductUnitDto
             {
                 Id = x.Id,
@@ -59,7 +63,7 @@ public class ProductUnitService : IProductUnitService
 
     public async Task<ProductUnitDto?> GetByIdAsync(int id)
     {
-        return await _context.ProductUnits
+        return await _db.ProductUnits
             .AsNoTracking()
             .Where(x => x.Id == id)
             .Select(x => new ProductUnitDto
@@ -81,44 +85,63 @@ public class ProductUnitService : IProductUnitService
 
     public async Task<ProductUnitDto> CreateAsync(ProductUnitDto dto)
     {
-        var productExists = await _context.Products
+        // Validate Product
+        var productExists = await _db.Products
             .AnyAsync(x => x.Id == dto.ProductId && x.IsActive);
 
         if (!productExists)
-            throw new KeyNotFoundException("Product not found.");
+        {
+            throw new InvalidOperationException(
+                $"Product with ID {dto.ProductId} was not found or is inactive.");
+        }
 
-        var unitExists = await _context.Units
+        // Validate Unit
+        var unitExists = await _db.Units
             .AnyAsync(x => x.Id == dto.UnitId && x.IsActive);
 
         if (!unitExists)
-            throw new KeyNotFoundException("Unit not found.");
-
-        if (dto.ConversionQuantity <= 0)
-            throw new ArgumentException(
-                "ConversionQuantity must be greater than 0.");
-
-        var duplicate = await _context.ProductUnits
-            .AnyAsync(x =>
-                x.ProductId == dto.ProductId &&
-                x.UnitId == dto.UnitId);
-
-        if (duplicate)
-            throw new InvalidOperationException(
-                "This unit is already assigned to the product.");
-
-        if (dto.IsBaseUnit)
         {
-            var existingBase = await _context.ProductUnits
-                .AnyAsync(x =>
-                    x.ProductId == dto.ProductId &&
-                    x.IsBaseUnit);
-
-            if (existingBase)
-                throw new InvalidOperationException(
-                    "Product already has a base unit.");
+            throw new InvalidOperationException(
+                $"Unit with ID {dto.UnitId} was not found or is inactive.");
         }
 
-        var entity = new BIZ.Domain.Entities.ProductUnit
+        // Conversion validation
+        if (dto.ConversionQuantity <= 0)
+        {
+            throw new InvalidOperationException(
+                "ConversionQuantity must be greater than zero.");
+        }
+
+        // Duplicate Product + Unit
+        var duplicate = await _db.ProductUnits
+            .AnyAsync(x =>
+                x.ProductId == dto.ProductId &&
+                x.UnitId == dto.UnitId &&
+                x.IsActive);
+
+        if (duplicate)
+        {
+            throw new InvalidOperationException(
+                "This Product and Unit combination already exists.");
+        }
+
+        // Only one Base Unit
+        if (dto.IsBaseUnit)
+        {
+            var baseUnitExists = await _db.ProductUnits
+                .AnyAsync(x =>
+                    x.ProductId == dto.ProductId &&
+                    x.IsBaseUnit &&
+                    x.IsActive);
+
+            if (baseUnitExists)
+            {
+                throw new InvalidOperationException(
+                    "This product already has a base unit.");
+            }
+        }
+
+        var entity = new ProductUnit
         {
             ProductId = dto.ProductId,
             UnitId = dto.UnitId,
@@ -132,50 +155,78 @@ public class ProductUnitService : IProductUnitService
             IsActive = dto.IsActive
         };
 
-        _context.ProductUnits.Add(entity);
+        _db.ProductUnits.Add(entity);
 
-        await _context.SaveChangesAsync();
+        await _db.SaveChangesAsync();
 
         dto.Id = entity.Id;
 
         return dto;
     }
 
-    public async Task<bool> UpdateAsync(
-        int id,
-        ProductUnitDto dto)
+    public async Task<bool> UpdateAsync(int id, ProductUnitDto dto)
     {
-        var entity = await _context.ProductUnits
+        var entity = await _db.ProductUnits
             .FirstOrDefaultAsync(x => x.Id == id);
 
         if (entity is null)
             return false;
 
-        if (dto.ConversionQuantity <= 0)
-            throw new ArgumentException(
-                "ConversionQuantity must be greater than 0.");
+        // Validate Product
+        var productExists = await _db.Products
+            .AnyAsync(x => x.Id == dto.ProductId && x.IsActive);
 
-        var duplicate = await _context.ProductUnits
+        if (!productExists)
+        {
+            throw new InvalidOperationException(
+                $"Product with ID {dto.ProductId} was not found or is inactive.");
+        }
+
+        // Validate Unit
+        var unitExists = await _db.Units
+            .AnyAsync(x => x.Id == dto.UnitId && x.IsActive);
+
+        if (!unitExists)
+        {
+            throw new InvalidOperationException(
+                $"Unit with ID {dto.UnitId} was not found or is inactive.");
+        }
+
+        if (dto.ConversionQuantity <= 0)
+        {
+            throw new InvalidOperationException(
+                "ConversionQuantity must be greater than zero.");
+        }
+
+        // Duplicate Product + Unit
+        var duplicate = await _db.ProductUnits
             .AnyAsync(x =>
                 x.Id != id &&
                 x.ProductId == dto.ProductId &&
-                x.UnitId == dto.UnitId);
+                x.UnitId == dto.UnitId &&
+                x.IsActive);
 
         if (duplicate)
+        {
             throw new InvalidOperationException(
-                "This unit is already assigned to the product.");
+                "This Product and Unit combination already exists.");
+        }
 
+        // Only one Base Unit
         if (dto.IsBaseUnit)
         {
-            var existingBase = await _context.ProductUnits
+            var baseUnitExists = await _db.ProductUnits
                 .AnyAsync(x =>
                     x.Id != id &&
                     x.ProductId == dto.ProductId &&
-                    x.IsBaseUnit);
+                    x.IsBaseUnit &&
+                    x.IsActive);
 
-            if (existingBase)
+            if (baseUnitExists)
+            {
                 throw new InvalidOperationException(
-                    "Product already has another base unit.");
+                    "This product already has a base unit.");
+            }
         }
 
         entity.ProductId = dto.ProductId;
@@ -189,22 +240,23 @@ public class ProductUnitService : IProductUnitService
         entity.MRP = dto.MRP;
         entity.IsActive = dto.IsActive;
 
-        await _context.SaveChangesAsync();
+        await _db.SaveChangesAsync();
 
         return true;
     }
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var entity = await _context.ProductUnits
+        var entity = await _db.ProductUnits
             .FirstOrDefaultAsync(x => x.Id == id);
 
         if (entity is null)
             return false;
 
+        // Soft delete
         entity.IsActive = false;
 
-        await _context.SaveChangesAsync();
+        await _db.SaveChangesAsync();
 
         return true;
     }

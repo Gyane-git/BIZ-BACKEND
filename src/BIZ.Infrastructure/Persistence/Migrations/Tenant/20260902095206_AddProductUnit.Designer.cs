@@ -4,6 +4,7 @@ using BIZ.Infrastructure.Persistence.Tenant;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260902095206_AddProductUnit")]
+    partial class AddProductUnit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -684,49 +687,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                     b.ToTable("Products", (string)null);
                 });
 
-            modelBuilder.Entity("BIZ.Domain.Entities.ProductBarcode", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Barcode")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPrimary")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ProductUnitId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Barcode")
-                        .IsUnique();
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("ProductUnitId");
-
-                    b.ToTable("ProductBarcodes", (string)null);
-                });
-
             modelBuilder.Entity("BIZ.Domain.Entities.ProductCategory", b =>
                 {
                     b.Property<int>("Id")
@@ -803,48 +763,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                         .IsUnique();
 
                     b.ToTable("ProductGroups", (string)null);
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.ProductImage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AltText")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("DisplayOrder")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPrimary")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId", "DisplayOrder");
-
-                    b.ToTable("ProductImages", (string)null);
                 });
 
             modelBuilder.Entity("BIZ.Domain.Entities.ProductSubGroup", b =>
@@ -1323,35 +1241,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                     b.Navigation("Brand");
                 });
 
-            modelBuilder.Entity("BIZ.Domain.Entities.ProductBarcode", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.Product", "Product")
-                        .WithMany("ProductBarcodes")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.ProductUnit", "ProductUnit")
-                        .WithMany()
-                        .HasForeignKey("ProductUnitId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Product");
-
-                    b.Navigation("ProductUnit");
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.ProductImage", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.Product", "Product")
-                        .WithMany("ProductImages")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("BIZ.Domain.Entities.ProductSubGroup", b =>
                 {
                     b.HasOne("BIZ.Domain.Entities.ProductGroup", "ProductGroup")
@@ -1434,10 +1323,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
 
             modelBuilder.Entity("BIZ.Domain.Entities.Product", b =>
                 {
-                    b.Navigation("ProductBarcodes");
-
-                    b.Navigation("ProductImages");
-
                     b.Navigation("ProductUnits");
                 });
 

@@ -8,16 +8,17 @@ namespace BIZ.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class ProductUnitController : ControllerBase
+public class ProductBarcodeController : ControllerBase
 {
-    private readonly IProductUnitService _service;
+    private readonly IProductBarcodeService _service;
 
-    public ProductUnitController(IProductUnitService service)
+    public ProductBarcodeController(
+        IProductBarcodeService service)
     {
         _service = service;
     }
 
-    // GET: api/ProductUnit
+    // GET: api/ProductBarcode
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -30,11 +31,13 @@ public class ProductUnitController : ControllerBase
         });
     }
 
-    // GET: api/ProductUnit/product/1
+    // GET: api/ProductBarcode/product/1
     [HttpGet("product/{productId}")]
-    public async Task<IActionResult> GetByProduct(int productId)
+    public async Task<IActionResult> GetByProduct(
+        int productId)
     {
-        var data = await _service.GetByProductAsync(productId);
+        var data = await _service
+            .GetByProductAsync(productId);
 
         return Ok(new
         {
@@ -43,18 +46,20 @@ public class ProductUnitController : ControllerBase
         });
     }
 
-    // GET: api/ProductUnit/1
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    // GET: api/ProductBarcode/barcode/123456
+    [HttpGet("barcode/{barcode}")]
+    public async Task<IActionResult> GetByBarcode(
+        string barcode)
     {
-        var data = await _service.GetByIdAsync(id);
+        var data = await _service
+            .GetByBarcodeAsync(barcode);
 
         if (data is null)
         {
             return NotFound(new
             {
                 success = false,
-                message = "ProductUnit not found."
+                message = "Barcode not found."
             });
         }
 
@@ -65,13 +70,38 @@ public class ProductUnitController : ControllerBase
         });
     }
 
-    // POST: api/ProductUnit
+    // GET: api/ProductBarcode/1
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var data = await _service
+            .GetByIdAsync(id);
+
+        if (data is null)
+        {
+            return NotFound(new
+            {
+                success = false,
+                message = "ProductBarcode not found."
+            });
+        }
+
+        return Ok(new
+        {
+            success = true,
+            data
+        });
+    }
+
+    // POST
     [HttpPost]
-    public async Task<IActionResult> Create(ProductUnitDto dto)
+    public async Task<IActionResult> Create(
+        ProductBarcodeDto dto)
     {
         try
         {
-            var data = await _service.CreateAsync(dto);
+            var data = await _service
+                .CreateAsync(dto);
 
             return CreatedAtAction(
                 nameof(GetById),
@@ -79,7 +109,7 @@ public class ProductUnitController : ControllerBase
                 new
                 {
                     success = true,
-                    message = "ProductUnit created successfully.",
+                    message = "ProductBarcode created successfully.",
                     data
                 });
         }
@@ -93,29 +123,30 @@ public class ProductUnitController : ControllerBase
         }
     }
 
-    // PUT: api/ProductUnit/1
+    // PUT
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(
         int id,
-        ProductUnitDto dto)
+        ProductBarcodeDto dto)
     {
         try
         {
-            var result = await _service.UpdateAsync(id, dto);
+            var result = await _service
+                .UpdateAsync(id, dto);
 
             if (!result)
             {
                 return NotFound(new
                 {
                     success = false,
-                    message = "ProductUnit not found."
+                    message = "ProductBarcode not found."
                 });
             }
 
             return Ok(new
             {
                 success = true,
-                message = "ProductUnit updated successfully."
+                message = "ProductBarcode updated successfully."
             });
         }
         catch (InvalidOperationException ex)
@@ -128,7 +159,7 @@ public class ProductUnitController : ControllerBase
         }
     }
 
-    // DELETE: api/ProductUnit/1
+    // DELETE
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -139,14 +170,14 @@ public class ProductUnitController : ControllerBase
             return NotFound(new
             {
                 success = false,
-                message = "ProductUnit not found."
+                message = "ProductBarcode not found."
             });
         }
 
         return Ok(new
         {
             success = true,
-            message = "ProductUnit deleted successfully."
+            message = "ProductBarcode deleted successfully."
         });
     }
 }

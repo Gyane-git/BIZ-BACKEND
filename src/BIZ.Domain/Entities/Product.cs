@@ -67,4 +67,10 @@ public class Product
     // Navigation
     public ICollection<ProductUnit> ProductUnits { get; set; }
         = new List<ProductUnit>();
+
+    public ICollection<ProductBarcode> ProductBarcodes { get; set; }
+    = new List<ProductBarcode>();
+    
+    public ICollection<ProductImage> ProductImages { get; set; }
+    = new List<ProductImage>();
 }

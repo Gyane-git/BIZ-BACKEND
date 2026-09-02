@@ -102,6 +102,8 @@ builder.Services.AddScoped<ICurrencyService, CurrencyService>();
 builder.Services.AddScoped<ICurrencyRateService,CurrencyRateService>();
 builder.Services.AddScoped<IProductUnitService, ProductUnitService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IProductBarcodeService,ProductBarcodeService>();
+builder.Services.AddScoped<IProductImageService,ProductImageService>();
 
 
 

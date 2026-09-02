@@ -45,6 +45,8 @@ public class TenantDbContext : DbContext
     public DbSet<CurrencyRate> CurrencyRates => Set<CurrencyRate>();
     public DbSet<Product> Products => Set<Product>();
     public DbSet<ProductUnit> ProductUnits => Set<ProductUnit>();
+    public DbSet<ProductBarcode> ProductBarcodes => Set<ProductBarcode>();
+    public DbSet<ProductImage> ProductImages => Set<ProductImage>();
 
     // ============================================================
     // Database Configuration
@@ -1048,6 +1050,7 @@ modelBuilder.Entity<ProductUnit>(entity =>
     entity.Property(x => x.IsActive)
         .IsRequired();
 
+    // Product + Unit must be unique
     entity.HasIndex(x => new
     {
         x.ProductId,
@@ -1055,14 +1058,94 @@ modelBuilder.Entity<ProductUnit>(entity =>
     })
     .IsUnique();
 
+    // Product relationship
     entity.HasOne(x => x.Product)
         .WithMany(x => x.ProductUnits)
         .HasForeignKey(x => x.ProductId)
         .OnDelete(DeleteBehavior.Restrict);
 
+    // Unit relationship
     entity.HasOne(x => x.Unit)
         .WithMany()
         .HasForeignKey(x => x.UnitId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+
+// ========================================================
+        // ProductBarcode
+        // ========================================================
+        modelBuilder.Entity<ProductBarcode>(entity =>
+{
+    entity.ToTable("ProductBarcodes");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.Barcode)
+        .IsRequired()
+        .HasMaxLength(100);
+
+    entity.HasIndex(x => x.Barcode)
+        .IsUnique();
+
+    entity.Property(x => x.IsPrimary)
+        .IsRequired();
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.Product)
+        .WithMany(x => x.ProductBarcodes)
+        .HasForeignKey(x => x.ProductId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.ProductUnit)
+        .WithMany()
+        .HasForeignKey(x => x.ProductUnitId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+
+        // ========================================================
+        // ProductImage
+        // ========================================================
+        modelBuilder.Entity<ProductImage>(entity =>
+{
+    entity.ToTable("ProductImages");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.ImageUrl)
+        .IsRequired()
+        .HasMaxLength(1000);
+
+    entity.Property(x => x.AltText)
+        .HasMaxLength(250);
+
+    entity.Property(x => x.IsPrimary)
+        .IsRequired();
+
+    entity.Property(x => x.DisplayOrder)
+        .IsRequired();
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasIndex(x => new
+    {
+        x.ProductId,
+        x.DisplayOrder
+    });
+
+    entity.HasOne(x => x.Product)
+        .WithMany(x => x.ProductImages)
+        .HasForeignKey(x => x.ProductId)
         .OnDelete(DeleteBehavior.Restrict);
 });
 

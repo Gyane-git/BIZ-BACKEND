@@ -8,16 +8,17 @@ namespace BIZ.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class ProductUnitController : ControllerBase
+public class ProductImageController : ControllerBase
 {
-    private readonly IProductUnitService _service;
+    private readonly IProductImageService _service;
 
-    public ProductUnitController(IProductUnitService service)
+    public ProductImageController(
+        IProductImageService service)
     {
         _service = service;
     }
 
-    // GET: api/ProductUnit
+    // GET: api/ProductImage
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -30,11 +31,13 @@ public class ProductUnitController : ControllerBase
         });
     }
 
-    // GET: api/ProductUnit/product/1
+    // GET: api/ProductImage/product/1
     [HttpGet("product/{productId}")]
-    public async Task<IActionResult> GetByProduct(int productId)
+    public async Task<IActionResult> GetByProduct(
+        int productId)
     {
-        var data = await _service.GetByProductAsync(productId);
+        var data = await _service
+            .GetByProductAsync(productId);
 
         return Ok(new
         {
@@ -43,18 +46,19 @@ public class ProductUnitController : ControllerBase
         });
     }
 
-    // GET: api/ProductUnit/1
+    // GET: api/ProductImage/1
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var data = await _service.GetByIdAsync(id);
+        var data = await _service
+            .GetByIdAsync(id);
 
         if (data is null)
         {
             return NotFound(new
             {
                 success = false,
-                message = "ProductUnit not found."
+                message = "ProductImage not found."
             });
         }
 
@@ -65,13 +69,15 @@ public class ProductUnitController : ControllerBase
         });
     }
 
-    // POST: api/ProductUnit
+    // POST
     [HttpPost]
-    public async Task<IActionResult> Create(ProductUnitDto dto)
+    public async Task<IActionResult> Create(
+        ProductImageDto dto)
     {
         try
         {
-            var data = await _service.CreateAsync(dto);
+            var data = await _service
+                .CreateAsync(dto);
 
             return CreatedAtAction(
                 nameof(GetById),
@@ -79,7 +85,7 @@ public class ProductUnitController : ControllerBase
                 new
                 {
                     success = true,
-                    message = "ProductUnit created successfully.",
+                    message = "ProductImage created successfully.",
                     data
                 });
         }
@@ -93,29 +99,30 @@ public class ProductUnitController : ControllerBase
         }
     }
 
-    // PUT: api/ProductUnit/1
+    // PUT
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(
         int id,
-        ProductUnitDto dto)
+        ProductImageDto dto)
     {
         try
         {
-            var result = await _service.UpdateAsync(id, dto);
+            var result = await _service
+                .UpdateAsync(id, dto);
 
             if (!result)
             {
                 return NotFound(new
                 {
                     success = false,
-                    message = "ProductUnit not found."
+                    message = "ProductImage not found."
                 });
             }
 
             return Ok(new
             {
                 success = true,
-                message = "ProductUnit updated successfully."
+                message = "ProductImage updated successfully."
             });
         }
         catch (InvalidOperationException ex)
@@ -128,7 +135,7 @@ public class ProductUnitController : ControllerBase
         }
     }
 
-    // DELETE: api/ProductUnit/1
+    // DELETE
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -139,14 +146,14 @@ public class ProductUnitController : ControllerBase
             return NotFound(new
             {
                 success = false,
-                message = "ProductUnit not found."
+                message = "ProductImage not found."
             });
         }
 
         return Ok(new
         {
             success = true,
-            message = "ProductUnit deleted successfully."
+            message = "ProductImage deleted successfully."
         });
     }
 }
