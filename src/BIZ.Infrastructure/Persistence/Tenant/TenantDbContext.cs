@@ -43,6 +43,8 @@ public class TenantDbContext : DbContext
     public DbSet<Rack> Racks => Set<Rack>();
     public DbSet<Currency> Currencies => Set<Currency>();
     public DbSet<CurrencyRate> CurrencyRates => Set<CurrencyRate>();
+    public DbSet<Product> Products => Set<Product>();
+    public DbSet<ProductUnit> ProductUnits => Set<ProductUnit>();
 
     // ============================================================
     // Database Configuration
@@ -909,7 +911,160 @@ modelBuilder.Entity<WarehouseLocation>(entity =>
         .HasForeignKey(x => x.CurrencyId)
         .OnDelete(DeleteBehavior.Restrict);
 });
-        
+
+        // ========================================================
+        // Product
+        // ======================================================== 
+
+       modelBuilder.Entity<Product>(entity =>
+{
+    entity.ToTable("Products");
+
+    entity.HasKey(x => x.Id);
+
+    // Basic
+    entity.Property(x => x.Code)
+        .IsRequired()
+        .HasMaxLength(25);
+
+    entity.HasIndex(x => x.Code)
+        .IsUnique();
+
+    entity.Property(x => x.Name)
+        .IsRequired()
+        .HasMaxLength(250);
+
+    entity.HasIndex(x => x.Name)
+        .IsUnique();
+
+    entity.Property(x => x.ShortName)
+        .IsRequired()
+        .HasMaxLength(25);
+
+    // Classification
+    entity.Property(x => x.Category)
+        .HasMaxLength(1);
+
+    entity.Property(x => x.ValuationMethod)
+        .HasMaxLength(1);
+
+    entity.Property(x => x.ProductGroupCode)
+        .HasMaxLength(15);
+
+    entity.Property(x => x.ProductSubGroupCode)
+        .HasMaxLength(15);
+
+    // Pricing
+    entity.Property(x => x.MRP)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.TradeRate)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.BuyRate)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.SalesRate)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.DealerPrice)
+        .HasPrecision(16, 6);
+
+    entity.Property(x => x.DiscountRate)
+        .HasPrecision(16, 6);
+
+    entity.Property(x => x.Margin)
+        .HasPrecision(16, 6);
+
+    // Tax
+    entity.Property(x => x.Vat)
+        .HasPrecision(10, 6);
+
+    entity.Property(x => x.ExciseRate)
+        .HasPrecision(16, 6);
+
+    entity.Property(x => x.BeforeVat)
+        .HasPrecision(16, 6);
+
+    // Inventory
+    entity.Property(x => x.MaxStock)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.ReorderLevel)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.ReorderQty)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.CurrencyCode)
+        .HasMaxLength(30);
+
+    // Other
+    entity.Property(x => x.HSCode)
+        .HasMaxLength(50);
+
+    // Accounting
+    entity.Property(x => x.PurchaseGLCode)
+        .HasMaxLength(25);
+
+    entity.Property(x => x.PurchaseReturnGLCode)
+        .HasMaxLength(25);
+
+    entity.Property(x => x.SalesGLCode)
+        .HasMaxLength(25);
+
+    entity.Property(x => x.SalesReturnGLCode)
+        .HasMaxLength(25);
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+});
+
+        // ========================================================
+        // ProductUnit
+        // ========================================================
+modelBuilder.Entity<ProductUnit>(entity =>
+{
+    entity.ToTable("ProductUnits");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.ConversionQuantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.PurchaseRate)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.SalesRate)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.MRP)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.HasIndex(x => new
+    {
+        x.ProductId,
+        x.UnitId
+    })
+    .IsUnique();
+
+    entity.HasOne(x => x.Product)
+        .WithMany(x => x.ProductUnits)
+        .HasForeignKey(x => x.ProductId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.Unit)
+        .WithMany()
+        .HasForeignKey(x => x.UnitId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
 
 
     }

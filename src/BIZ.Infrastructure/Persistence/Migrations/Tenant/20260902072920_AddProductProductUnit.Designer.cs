@@ -4,6 +4,7 @@ using BIZ.Infrastructure.Persistence.Tenant;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260902072920_AddProductProductUnit")]
+    partial class AddProductProductUnit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -536,10 +539,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal?>("BeforeVat")
-                        .HasPrecision(16, 6)
-                        .HasColumnType("decimal(16,6)");
-
                     b.Property<decimal?>("BuyRate")
                         .HasPrecision(18, 8)
                         .HasColumnType("decimal(18,8)");
@@ -560,18 +559,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<decimal?>("DealerPrice")
-                        .HasPrecision(16, 6)
-                        .HasColumnType("decimal(16,6)");
-
-                    b.Property<decimal?>("DiscountRate")
-                        .HasPrecision(16, 6)
-                        .HasColumnType("decimal(16,6)");
-
-                    b.Property<decimal?>("ExciseRate")
-                        .HasPrecision(16, 6)
-                        .HasColumnType("decimal(16,6)");
-
                     b.Property<string>("HSCode")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -591,19 +578,12 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                     b.Property<bool>("IsFavourite")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsInsurableItem")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsRestaurantProduct")
                         .HasColumnType("bit");
 
                     b.Property<decimal?>("MRP")
                         .HasPrecision(18, 8)
                         .HasColumnType("decimal(18,8)");
-
-                    b.Property<decimal?>("Margin")
-                        .HasPrecision(16, 6)
-                        .HasColumnType("decimal(16,6)");
 
                     b.Property<decimal?>("MaxStock")
                         .HasPrecision(18, 8)
@@ -625,36 +605,15 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                         .HasMaxLength(15)
                         .HasColumnType("nvarchar(15)");
 
-                    b.Property<string>("PurchaseGLCode")
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
-
-                    b.Property<string>("PurchaseReturnGLCode")
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
-
                     b.Property<decimal?>("ReorderLevel")
                         .HasPrecision(18, 8)
                         .HasColumnType("decimal(18,8)");
-
-                    b.Property<decimal?>("ReorderQty")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<string>("SalesGLCode")
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
 
                     b.Property<decimal?>("SalesRate")
                         .HasPrecision(18, 8)
                         .HasColumnType("decimal(18,8)");
 
-                    b.Property<string>("SalesReturnGLCode")
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
-
                     b.Property<string>("ShortName")
-                        .IsRequired()
                         .HasMaxLength(25)
                         .HasColumnType("nvarchar(25)");
 
