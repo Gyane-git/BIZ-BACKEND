@@ -1,10 +1,8 @@
 namespace BIZ.Domain.Entities;
 
-public class AccountSubGroup
+public class CostCenter
 {
     public int Id { get; set; }
-
-    public int AccountGroupId { get; set; }
 
     public string Code { get; set; } = string.Empty;
 
@@ -12,12 +10,22 @@ public class AccountSubGroup
 
     public string? Description { get; set; }
 
+    public int? CompanyUnitId { get; set; }
+
+    public int? BranchId { get; set; }
+
+    public int? DepartmentId { get; set; }
+
     public bool IsActive { get; set; } = true;
 
     public DateTime CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
 
-    public AccountGroup AccountGroup { get; set; } = null!;
-    public ICollection<LedgerAccount> LedgerAccounts { get; set; } = new List<LedgerAccount>();
+    // Navigation
+    public CompanyUnit? CompanyUnit { get; set; }
+
+    public Branch? Branch { get; set; }
+
+    public Department? Department { get; set; }
 }

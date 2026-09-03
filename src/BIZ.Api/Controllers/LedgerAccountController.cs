@@ -8,11 +8,12 @@ namespace BIZ.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class AccountGroupController : ControllerBase
+public class LedgerAccountController : ControllerBase
 {
-    private readonly IAccountGroupService _service;
+    private readonly ILedgerAccountService _service;
 
-    public AccountGroupController(IAccountGroupService service)
+    public LedgerAccountController(
+        ILedgerAccountService service)
     {
         _service = service;
     }
@@ -21,6 +22,21 @@ public class AccountGroupController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var data = await _service.GetAllAsync();
+
+        return Ok(new
+        {
+            success = true,
+            data
+        });
+    }
+
+    [HttpGet("account-sub-group/{accountSubGroupId:int}")]
+    public async Task<IActionResult> GetByAccountSubGroup(
+        int accountSubGroupId)
+    {
+        var data =
+            await _service.GetByAccountSubGroupAsync(
+                accountSubGroupId);
 
         return Ok(new
         {
@@ -39,7 +55,7 @@ public class AccountGroupController : ControllerBase
             return NotFound(new
             {
                 success = false,
-                message = "AccountGroup not found."
+                message = "LedgerAccount not found."
             });
         }
 
@@ -51,16 +67,18 @@ public class AccountGroupController : ControllerBase
     }
 
     [HttpGet("code/{code}")]
-    public async Task<IActionResult> GetByCode(string code)
+    public async Task<IActionResult> GetByCode(
+        string code)
     {
-        var data = await _service.GetByCodeAsync(code);
+        var data =
+            await _service.GetByCodeAsync(code);
 
         if (data is null)
         {
             return NotFound(new
             {
                 success = false,
-                message = "AccountGroup not found."
+                message = "LedgerAccount not found."
             });
         }
 
@@ -73,16 +91,17 @@ public class AccountGroupController : ControllerBase
 
     [HttpPost]
     public async Task<IActionResult> Create(
-        [FromBody] AccountGroupDto dto)
+        [FromBody] LedgerAccountDto dto)
     {
         try
         {
-            var data = await _service.CreateAsync(dto);
+            var data =
+                await _service.CreateAsync(dto);
 
             return Ok(new
             {
                 success = true,
-                message = "AccountGroup created successfully.",
+                message = "LedgerAccount created successfully.",
                 data
             });
         }
@@ -107,25 +126,26 @@ public class AccountGroupController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(
         int id,
-        [FromBody] AccountGroupDto dto)
+        [FromBody] LedgerAccountDto dto)
     {
         try
         {
-            var result = await _service.UpdateAsync(id, dto);
+            var result =
+                await _service.UpdateAsync(id, dto);
 
             if (!result)
             {
                 return NotFound(new
                 {
                     success = false,
-                    message = "AccountGroup not found."
+                    message = "LedgerAccount not found."
                 });
             }
 
             return Ok(new
             {
                 success = true,
-                message = "AccountGroup updated successfully."
+                message = "LedgerAccount updated successfully."
             });
         }
         catch (ArgumentException ex)
@@ -149,21 +169,22 @@ public class AccountGroupController : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var result = await _service.DeleteAsync(id);
+        var result =
+            await _service.DeleteAsync(id);
 
         if (!result)
         {
             return NotFound(new
             {
                 success = false,
-                message = "AccountGroup not found."
+                message = "LedgerAccount not found."
             });
         }
 
         return Ok(new
         {
             success = true,
-            message = "AccountGroup deleted successfully."
+            message = "LedgerAccount deleted successfully."
         });
     }
 }

@@ -54,6 +54,9 @@ public class TenantDbContext : DbContext
 
     public DbSet<AccountGroup> AccountGroups => Set<AccountGroup>();
     public DbSet<AccountSubGroup> AccountSubGroups => Set<AccountSubGroup>();
+    public DbSet<LedgerAccount> LedgerAccounts => Set<LedgerAccount>();
+    public DbSet<SubLedger> SubLedgers => Set<SubLedger>();
+    public DbSet<CostCenter> CostCenters => Set<CostCenter>();
 
 
 
@@ -1432,6 +1435,184 @@ modelBuilder.Entity<ProductUnit>(entity =>
     entity.HasOne(x => x.AccountGroup)
         .WithMany(x => x.AccountSubGroups)
         .HasForeignKey(x => x.AccountGroupId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+});
+
+// ========================================================
+        // LedgerAccount
+        // ========================================================
+        modelBuilder.Entity<LedgerAccount>(entity =>
+{
+    entity.ToTable("LedgerAccounts");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.Code)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.Code)
+        .IsUnique();
+
+    entity.Property(x => x.Name)
+        .IsRequired()
+        .HasMaxLength(200);
+
+    entity.HasIndex(x => new
+    {
+        x.AccountSubGroupId,
+        x.Name
+    })
+    .IsUnique();
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.AccountType)
+        .IsRequired()
+        .HasMaxLength(30);
+
+    entity.Property(x => x.OpeningDebit)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.OpeningCredit)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.IsControlAccount)
+        .IsRequired();
+
+    entity.Property(x => x.AllowManualEntry)
+        .IsRequired();
+
+    entity.Property(x => x.IsReconciliationRequired)
+        .IsRequired();
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.AccountSubGroup)
+        .WithMany()
+        .HasForeignKey(x => x.AccountSubGroupId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+
+});
+
+
+// ========================================================
+        // SubLedger
+        // ========================================================
+        modelBuilder.Entity<SubLedger>(entity =>
+{
+    entity.ToTable("SubLedgers");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.Code)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.Code)
+        .IsUnique();
+
+    entity.Property(x => x.Name)
+        .IsRequired()
+        .HasMaxLength(200);
+
+    entity.HasIndex(x => new
+    {
+        x.LedgerAccountId,
+        x.Name
+    })
+    .IsUnique();
+
+    entity.Property(x => x.ContactPerson)
+        .HasMaxLength(200);
+
+    entity.Property(x => x.Phone)
+        .HasMaxLength(50);
+
+    entity.Property(x => x.Email)
+        .HasMaxLength(200);
+
+    entity.Property(x => x.Address)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.TaxNumber)
+        .HasMaxLength(100);
+
+    entity.Property(x => x.OpeningDebit)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.OpeningCredit)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.LedgerAccount)
+        .WithMany(x => x.SubLedgers)
+        .HasForeignKey(x => x.LedgerAccountId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+
+// ========================================================
+        // CostCenter
+        // ========================================================
+        modelBuilder.Entity<CostCenter>(entity =>
+{
+    entity.ToTable("CostCenters");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.Code)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.Code)
+        .IsUnique();
+
+    entity.Property(x => x.Name)
+        .IsRequired()
+        .HasMaxLength(200);
+
+    entity.HasIndex(x => x.Name)
+        .IsUnique();
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.CompanyUnit)
+        .WithMany()
+        .HasForeignKey(x => x.CompanyUnitId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.Branch)
+        .WithMany()
+        .HasForeignKey(x => x.BranchId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.Department)
+        .WithMany()
+        .HasForeignKey(x => x.DepartmentId)
         .OnDelete(DeleteBehavior.Restrict);
 });
 

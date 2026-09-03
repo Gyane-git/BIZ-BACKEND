@@ -8,15 +8,16 @@ namespace BIZ.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class AccountGroupController : ControllerBase
+public class SubLedgerController : ControllerBase
 {
-    private readonly IAccountGroupService _service;
+    private readonly ISubLedgerService _service;
 
-    public AccountGroupController(IAccountGroupService service)
+    public SubLedgerController(ISubLedgerService service)
     {
         _service = service;
     }
 
+    // GET: api/SubLedger
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -29,17 +30,33 @@ public class AccountGroupController : ControllerBase
         });
     }
 
+    // GET: api/SubLedger/ledger-account/1
+    [HttpGet("ledger-account/{ledgerAccountId}")]
+    public async Task<IActionResult> GetByLedgerAccount(
+        int ledgerAccountId)
+    {
+        var data = await _service
+            .GetByLedgerAccountAsync(ledgerAccountId);
+
+        return Ok(new
+        {
+            success = true,
+            data
+        });
+    }
+
+    // GET: api/SubLedger/1
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
         var data = await _service.GetByIdAsync(id);
 
-        if (data is null)
+        if (data == null)
         {
             return NotFound(new
             {
                 success = false,
-                message = "AccountGroup not found."
+                message = "SubLedger not found."
             });
         }
 
@@ -50,17 +67,18 @@ public class AccountGroupController : ControllerBase
         });
     }
 
+    // GET: api/SubLedger/code/CUST001
     [HttpGet("code/{code}")]
     public async Task<IActionResult> GetByCode(string code)
     {
         var data = await _service.GetByCodeAsync(code);
 
-        if (data is null)
+        if (data == null)
         {
             return NotFound(new
             {
                 success = false,
-                message = "AccountGroup not found."
+                message = "SubLedger not found."
             });
         }
 
@@ -71,20 +89,24 @@ public class AccountGroupController : ControllerBase
         });
     }
 
+    // POST: api/SubLedger
     [HttpPost]
     public async Task<IActionResult> Create(
-        [FromBody] AccountGroupDto dto)
+        [FromBody] SubLedgerDto dto)
     {
         try
         {
             var data = await _service.CreateAsync(dto);
 
-            return Ok(new
-            {
-                success = true,
-                message = "AccountGroup created successfully.",
-                data
-            });
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = data.Id },
+                new
+                {
+                    success = true,
+                    message = "SubLedger created successfully.",
+                    data
+                });
         }
         catch (ArgumentException ex)
         {
@@ -104,10 +126,11 @@ public class AccountGroupController : ControllerBase
         }
     }
 
+    // PUT: api/SubLedger/1
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(
         int id,
-        [FromBody] AccountGroupDto dto)
+        [FromBody] SubLedgerDto dto)
     {
         try
         {
@@ -118,14 +141,14 @@ public class AccountGroupController : ControllerBase
                 return NotFound(new
                 {
                     success = false,
-                    message = "AccountGroup not found."
+                    message = "SubLedger not found."
                 });
             }
 
             return Ok(new
             {
                 success = true,
-                message = "AccountGroup updated successfully."
+                message = "SubLedger updated successfully."
             });
         }
         catch (ArgumentException ex)
@@ -146,6 +169,7 @@ public class AccountGroupController : ControllerBase
         }
     }
 
+    // DELETE: api/SubLedger/1
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -156,14 +180,14 @@ public class AccountGroupController : ControllerBase
             return NotFound(new
             {
                 success = false,
-                message = "AccountGroup not found."
+                message = "SubLedger not found."
             });
         }
 
         return Ok(new
         {
             success = true,
-            message = "AccountGroup deleted successfully."
+            message = "SubLedger deleted successfully."
         });
     }
 }

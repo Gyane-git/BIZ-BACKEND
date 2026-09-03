@@ -8,11 +8,12 @@ namespace BIZ.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class AccountGroupController : ControllerBase
+public class CostCenterController : ControllerBase
 {
-    private readonly IAccountGroupService _service;
+    private readonly ICostCenterService _service;
 
-    public AccountGroupController(IAccountGroupService service)
+    public CostCenterController(
+        ICostCenterService service)
     {
         _service = service;
     }
@@ -34,12 +35,12 @@ public class AccountGroupController : ControllerBase
     {
         var data = await _service.GetByIdAsync(id);
 
-        if (data is null)
+        if (data == null)
         {
             return NotFound(new
             {
                 success = false,
-                message = "AccountGroup not found."
+                message = "CostCenter not found."
             });
         }
 
@@ -51,16 +52,17 @@ public class AccountGroupController : ControllerBase
     }
 
     [HttpGet("code/{code}")]
-    public async Task<IActionResult> GetByCode(string code)
+    public async Task<IActionResult> GetByCode(
+        string code)
     {
         var data = await _service.GetByCodeAsync(code);
 
-        if (data is null)
+        if (data == null)
         {
             return NotFound(new
             {
                 success = false,
-                message = "AccountGroup not found."
+                message = "CostCenter not found."
             });
         }
 
@@ -71,20 +73,51 @@ public class AccountGroupController : ControllerBase
         });
     }
 
+    [HttpGet("branch/{branchId}")]
+    public async Task<IActionResult> GetByBranch(
+        int branchId)
+    {
+        var data = await _service
+            .GetByBranchAsync(branchId);
+
+        return Ok(new
+        {
+            success = true,
+            data
+        });
+    }
+
+    [HttpGet("department/{departmentId}")]
+    public async Task<IActionResult> GetByDepartment(
+        int departmentId)
+    {
+        var data = await _service
+            .GetByDepartmentAsync(departmentId);
+
+        return Ok(new
+        {
+            success = true,
+            data
+        });
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create(
-        [FromBody] AccountGroupDto dto)
+        [FromBody] CostCenterDto dto)
     {
         try
         {
             var data = await _service.CreateAsync(dto);
 
-            return Ok(new
-            {
-                success = true,
-                message = "AccountGroup created successfully.",
-                data
-            });
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = data.Id },
+                new
+                {
+                    success = true,
+                    message = "CostCenter created successfully.",
+                    data
+                });
         }
         catch (ArgumentException ex)
         {
@@ -107,7 +140,7 @@ public class AccountGroupController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(
         int id,
-        [FromBody] AccountGroupDto dto)
+        [FromBody] CostCenterDto dto)
     {
         try
         {
@@ -118,14 +151,14 @@ public class AccountGroupController : ControllerBase
                 return NotFound(new
                 {
                     success = false,
-                    message = "AccountGroup not found."
+                    message = "CostCenter not found."
                 });
             }
 
             return Ok(new
             {
                 success = true,
-                message = "AccountGroup updated successfully."
+                message = "CostCenter updated successfully."
             });
         }
         catch (ArgumentException ex)
@@ -156,14 +189,14 @@ public class AccountGroupController : ControllerBase
             return NotFound(new
             {
                 success = false,
-                message = "AccountGroup not found."
+                message = "CostCenter not found."
             });
         }
 
         return Ok(new
         {
             success = true,
-            message = "AccountGroup deleted successfully."
+            message = "CostCenter deleted successfully."
         });
     }
 }

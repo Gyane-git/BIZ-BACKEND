@@ -110,7 +110,9 @@ builder.Services.AddScoped<IProductBatchService,ProductBatchService>();
 builder.Services.AddScoped<IProductSerialService,ProductSerialService>();
 builder.Services.AddScoped<IAccountGroupService, AccountGroupService>();
 builder.Services.AddScoped<IAccountSubGroupService, AccountSubGroupService>();
-
+builder.Services.AddScoped<ILedgerAccountService,LedgerAccountService>();
+builder.Services.AddScoped<ISubLedgerService,SubLedgerService>();
+builder.Services.AddScoped<ICostCenterService, CostCenterService>();
 
 
 
