@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using BIZ.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -117,7 +118,12 @@ builder.Services.AddScoped<IFiscalYearService,FiscalYearService>();
 builder.Services.AddScoped<IFiscalYearPeriodService,FiscalYearPeriodService>();
 builder.Services.AddScoped< IJournalService,JournalService>();
 builder.Services.AddScoped<IJournalLineService,JournalLineService>();
-
+builder.Services.AddScoped<ICashAccountService, CashAccountService>();
+builder.Services.AddScoped<IBankAccountService,BankAccountService>();
+builder.Services.AddScoped<IPaymentService,PaymentService>();
+builder.Services.AddScoped<IReceiptService,ReceiptService>();
+builder.Services.AddScoped<ICreditNoteService, CreditNoteService>();
+builder.Services.AddScoped<ICreditNoteLineService, CreditNoteLineService>();
 
 
 // ============================================================

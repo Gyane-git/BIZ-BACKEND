@@ -61,6 +61,21 @@ public class TenantDbContext : DbContext
     public DbSet<FiscalYearPeriod> FiscalYearPeriods=> Set<FiscalYearPeriod>();
     public DbSet<Journal> Journals => Set<Journal>();
     public DbSet<JournalLine> JournalLines => Set<JournalLine>();
+    public DbSet<CashAccount> CashAccounts => Set<CashAccount>();
+    public DbSet<BankAccount> BankAccounts=> Set<BankAccount>();
+    public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<Receipt> Receipts => Set<Receipt>();
+    public DbSet<CreditNote> CreditNotes => Set<CreditNote>();
+    public DbSet<CreditNoteLine> CreditNoteLines => Set<CreditNoteLine>();
+
+
+
+
+
+
+
+
+
 
 
     // ============================================================
@@ -1818,6 +1833,355 @@ modelBuilder.Entity<ProductUnit>(entity =>
         .HasForeignKey(x => x.CostCenterId)
         .OnDelete(DeleteBehavior.Restrict);
 });
+
+// ========================================================
+        // CashAccount
+        // ========================================================
+        modelBuilder.Entity<CashAccount>(entity =>
+{
+    entity.ToTable("CashAccounts");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.Code)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.Code)
+        .IsUnique();
+
+    entity.Property(x => x.Name)
+        .IsRequired()
+        .HasMaxLength(200);
+
+    entity.HasIndex(x => x.Name)
+        .IsUnique();
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.OpeningBalance)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.LedgerAccount)
+        .WithMany()
+        .HasForeignKey(x => x.LedgerAccountId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+  // ========================================================
+        // BankAccount
+        // ========================================================
+        modelBuilder.Entity<BankAccount>(entity =>
+{
+    entity.ToTable("BankAccounts");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.BankName)
+        .IsRequired()
+        .HasMaxLength(200);
+
+    entity.Property(x => x.BranchName)
+        .HasMaxLength(200);
+
+    entity.Property(x => x.AccountName)
+        .IsRequired()
+        .HasMaxLength(200);
+
+    entity.Property(x => x.AccountNumber)
+        .IsRequired()
+        .HasMaxLength(100);
+
+    entity.HasIndex(x => x.AccountNumber)
+        .IsUnique();
+
+    entity.Property(x => x.AccountType)
+        .IsRequired()
+        .HasMaxLength(30);
+
+    entity.Property(x => x.CurrencyCode)
+        .IsRequired()
+        .HasMaxLength(10);
+
+    entity.Property(x => x.OpeningBalance)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.LedgerAccount)
+        .WithMany()
+        .HasForeignKey(x => x.LedgerAccountId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+
+// ========================================================
+        // Payment
+        // ========================================================
+        modelBuilder.Entity<Payment>(entity =>
+{
+    entity.ToTable("Payments");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.PaymentNumber)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.PaymentNumber)
+        .IsUnique();
+
+    entity.Property(x => x.PaymentDate)
+        .IsRequired();
+
+    entity.Property(x => x.Amount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.PaymentMode)
+        .IsRequired()
+        .HasMaxLength(20);
+
+    entity.Property(x => x.ReferenceNumber)
+        .HasMaxLength(100);
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.Journal)
+        .WithMany()
+        .HasForeignKey(x => x.JournalId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.LedgerAccount)
+        .WithMany()
+        .HasForeignKey(x => x.LedgerAccountId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.SubLedger)
+        .WithMany()
+        .HasForeignKey(x => x.SubLedgerId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.CashAccount)
+        .WithMany()
+        .HasForeignKey(x => x.CashAccountId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.BankAccount)
+        .WithMany()
+        .HasForeignKey(x => x.BankAccountId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+// ========================================================
+        // Receipt
+        // ========================================================
+        modelBuilder.Entity<Receipt>(entity =>
+{
+    entity.ToTable("Receipts");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.ReceiptNumber)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.ReceiptNumber)
+        .IsUnique();
+
+    entity.Property(x => x.ReceiptDate)
+        .IsRequired();
+
+    entity.Property(x => x.Amount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.ReceiptMode)
+        .IsRequired()
+        .HasMaxLength(20);
+
+    entity.Property(x => x.ReferenceNumber)
+        .HasMaxLength(100);
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.Journal)
+        .WithMany()
+        .HasForeignKey(x => x.JournalId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.LedgerAccount)
+        .WithMany()
+        .HasForeignKey(x => x.LedgerAccountId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.SubLedger)
+        .WithMany()
+        .HasForeignKey(x => x.SubLedgerId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.CashAccount)
+        .WithMany()
+        .HasForeignKey(x => x.CashAccountId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.BankAccount)
+        .WithMany()
+        .HasForeignKey(x => x.BankAccountId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+// ========================================================
+        // CreditNote
+        // ========================================================
+       modelBuilder.Entity<CreditNote>(entity =>
+{
+    entity.ToTable("CreditNotes");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.CreditNoteNumber)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.CreditNoteNumber)
+        .IsUnique();
+
+    entity.Property(x => x.CreditNoteDate)
+        .IsRequired();
+
+    entity.Property(x => x.ReferenceNumber)
+        .HasMaxLength(100);
+
+    entity.Property(x => x.Reason)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.TotalAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.IsPosted)
+        .IsRequired();
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.FiscalYear)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.FiscalYearPeriod)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearPeriodId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.LedgerAccount)
+        .WithMany()
+        .HasForeignKey(x => x.LedgerAccountId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.SubLedger)
+        .WithMany()
+        .HasForeignKey(x => x.SubLedgerId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasMany(x => x.CreditNoteLines)
+        .WithOne(x => x.CreditNote)
+        .HasForeignKey(x => x.CreditNoteId)
+        .OnDelete(DeleteBehavior.Cascade);
+});
+
+// ========================================================
+        // creditNoteline
+        // ========================================================
+      
+modelBuilder.Entity<CreditNoteLine>(entity =>
+{
+    entity.ToTable("CreditNoteLines");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.Quantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.Rate)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.DiscountAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TaxableAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TaxAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.LineTotal)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.LineNumber)
+        .IsRequired();
+
+    entity.HasIndex(x => new
+    {
+        x.CreditNoteId,
+        x.LineNumber
+    })
+    .IsUnique();
+
+    entity.HasOne(x => x.CreditNote)
+        .WithMany(x => x.CreditNoteLines)
+        .HasForeignKey(x => x.CreditNoteId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    entity.HasOne(x => x.Product)
+        .WithMany()
+        .HasForeignKey(x => x.ProductId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+
+
+
 
 
 

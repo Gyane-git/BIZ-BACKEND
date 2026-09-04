@@ -4,6 +4,7 @@ using BIZ.Infrastructure.Persistence.Tenant;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260904050955_AddCashAccountAndBankAccount")]
+    partial class AddCashAccountAndBankAccount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -513,132 +516,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                         .IsUnique();
 
                     b.ToTable("CostCenters", (string)null);
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.CreditNote", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CreditNoteDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreditNoteNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("FiscalYearId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FiscalYearPeriodId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPosted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("LedgerAccountId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("PostedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Reason")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("ReferenceNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int?>("SubLedgerId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreditNoteNumber")
-                        .IsUnique();
-
-                    b.HasIndex("FiscalYearId");
-
-                    b.HasIndex("FiscalYearPeriodId");
-
-                    b.HasIndex("LedgerAccountId");
-
-                    b.HasIndex("SubLedgerId");
-
-                    b.ToTable("CreditNotes", (string)null);
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.CreditNoteLine", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CreditNoteId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<decimal>("DiscountAmount")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<int>("LineNumber")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("LineTotal")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Quantity")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<decimal>("Rate")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<decimal>("TaxAmount")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<decimal>("TaxableAmount")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("CreditNoteId", "LineNumber")
-                        .IsUnique();
-
-                    b.ToTable("CreditNoteLines", (string)null);
                 });
 
             modelBuilder.Entity("BIZ.Domain.Entities.Currency", b =>
@@ -1203,81 +1080,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                         .IsUnique();
 
                     b.ToTable("Models", (string)null);
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.Payment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<int?>("BankAccountId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CashAccountId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("JournalId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LedgerAccountId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PaymentMode")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("PaymentNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("ReferenceNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int?>("SubLedgerId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BankAccountId");
-
-                    b.HasIndex("CashAccountId");
-
-                    b.HasIndex("JournalId");
-
-                    b.HasIndex("LedgerAccountId");
-
-                    b.HasIndex("PaymentNumber")
-                        .IsUnique();
-
-                    b.HasIndex("SubLedgerId");
-
-                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("BIZ.Domain.Entities.Product", b =>
@@ -1990,81 +1792,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                     b.ToTable("Racks", (string)null);
                 });
 
-            modelBuilder.Entity("BIZ.Domain.Entities.Receipt", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<int?>("BankAccountId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CashAccountId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("JournalId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LedgerAccountId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ReceiptDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ReceiptMode")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("ReceiptNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("ReferenceNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int?>("SubLedgerId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BankAccountId");
-
-                    b.HasIndex("CashAccountId");
-
-                    b.HasIndex("JournalId");
-
-                    b.HasIndex("LedgerAccountId");
-
-                    b.HasIndex("ReceiptNumber")
-                        .IsUnique();
-
-                    b.HasIndex("SubLedgerId");
-
-                    b.ToTable("Receipts", (string)null);
-                });
-
             modelBuilder.Entity("BIZ.Domain.Entities.Region", b =>
                 {
                     b.Property<int>("Id")
@@ -2507,59 +2234,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                     b.Navigation("Department");
                 });
 
-            modelBuilder.Entity("BIZ.Domain.Entities.CreditNote", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.FiscalYear", "FiscalYear")
-                        .WithMany()
-                        .HasForeignKey("FiscalYearId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.FiscalYearPeriod", "FiscalYearPeriod")
-                        .WithMany()
-                        .HasForeignKey("FiscalYearPeriodId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.LedgerAccount", "LedgerAccount")
-                        .WithMany()
-                        .HasForeignKey("LedgerAccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.SubLedger", "SubLedger")
-                        .WithMany()
-                        .HasForeignKey("SubLedgerId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("FiscalYear");
-
-                    b.Navigation("FiscalYearPeriod");
-
-                    b.Navigation("LedgerAccount");
-
-                    b.Navigation("SubLedger");
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.CreditNoteLine", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.CreditNote", "CreditNote")
-                        .WithMany("CreditNoteLines")
-                        .HasForeignKey("CreditNoteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CreditNote");
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("BIZ.Domain.Entities.CurrencyRate", b =>
                 {
                     b.HasOne("BIZ.Domain.Entities.Currency", "Currency")
@@ -2658,46 +2332,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                         .IsRequired();
 
                     b.Navigation("Brand");
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.Payment", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.BankAccount", "BankAccount")
-                        .WithMany()
-                        .HasForeignKey("BankAccountId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("BIZ.Domain.Entities.CashAccount", "CashAccount")
-                        .WithMany()
-                        .HasForeignKey("CashAccountId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("BIZ.Domain.Entities.Journal", "Journal")
-                        .WithMany()
-                        .HasForeignKey("JournalId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.LedgerAccount", "LedgerAccount")
-                        .WithMany()
-                        .HasForeignKey("LedgerAccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.SubLedger", "SubLedger")
-                        .WithMany()
-                        .HasForeignKey("SubLedgerId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("BankAccount");
-
-                    b.Navigation("CashAccount");
-
-                    b.Navigation("Journal");
-
-                    b.Navigation("LedgerAccount");
-
-                    b.Navigation("SubLedger");
                 });
 
             modelBuilder.Entity("BIZ.Domain.Entities.ProductAttribute", b =>
@@ -2834,46 +2468,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                     b.Navigation("Warehouse");
                 });
 
-            modelBuilder.Entity("BIZ.Domain.Entities.Receipt", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.BankAccount", "BankAccount")
-                        .WithMany()
-                        .HasForeignKey("BankAccountId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("BIZ.Domain.Entities.CashAccount", "CashAccount")
-                        .WithMany()
-                        .HasForeignKey("CashAccountId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("BIZ.Domain.Entities.Journal", "Journal")
-                        .WithMany()
-                        .HasForeignKey("JournalId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.LedgerAccount", "LedgerAccount")
-                        .WithMany()
-                        .HasForeignKey("LedgerAccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.SubLedger", "SubLedger")
-                        .WithMany()
-                        .HasForeignKey("SubLedgerId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("BankAccount");
-
-                    b.Navigation("CashAccount");
-
-                    b.Navigation("Journal");
-
-                    b.Navigation("LedgerAccount");
-
-                    b.Navigation("SubLedger");
-                });
-
             modelBuilder.Entity("BIZ.Domain.Entities.SubLedger", b =>
                 {
                     b.HasOne("BIZ.Domain.Entities.LedgerAccount", "LedgerAccount")
@@ -2928,11 +2522,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
             modelBuilder.Entity("BIZ.Domain.Entities.Brand", b =>
                 {
                     b.Navigation("Models");
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.CreditNote", b =>
-                {
-                    b.Navigation("CreditNoteLines");
                 });
 
             modelBuilder.Entity("BIZ.Domain.Entities.Currency", b =>
