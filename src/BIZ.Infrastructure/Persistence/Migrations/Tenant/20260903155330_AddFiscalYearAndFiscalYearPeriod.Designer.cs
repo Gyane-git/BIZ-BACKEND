@@ -4,6 +4,7 @@ using BIZ.Infrastructure.Persistence.Tenant;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260903155330_AddFiscalYearAndFiscalYearPeriod")]
+    partial class AddFiscalYearAndFiscalYearPeriod
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -738,117 +741,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                         .IsUnique();
 
                     b.ToTable("FiscalYearPeriods", (string)null);
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.Journal", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("FiscalYearId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FiscalYearPeriodId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPosted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("JournalDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("JournalNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("JournalType")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<DateTime?>("PostedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ReferenceNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FiscalYearId");
-
-                    b.HasIndex("FiscalYearPeriodId");
-
-                    b.HasIndex("JournalNumber")
-                        .IsUnique();
-
-                    b.ToTable("Journals", (string)null);
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.JournalLine", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("CostCenterId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Credit")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<decimal>("Debit")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("JournalId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LedgerAccountId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LineNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("SubLedgerId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CostCenterId");
-
-                    b.HasIndex("LedgerAccountId");
-
-                    b.HasIndex("SubLedgerId");
-
-                    b.HasIndex("JournalId", "LineNumber")
-                        .IsUnique();
-
-                    b.ToTable("JournalLines", (string)null);
                 });
 
             modelBuilder.Entity("BIZ.Domain.Entities.LedgerAccount", b =>
@@ -2117,58 +2009,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                     b.Navigation("FiscalYear");
                 });
 
-            modelBuilder.Entity("BIZ.Domain.Entities.Journal", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.FiscalYear", "FiscalYear")
-                        .WithMany()
-                        .HasForeignKey("FiscalYearId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.FiscalYearPeriod", "FiscalYearPeriod")
-                        .WithMany()
-                        .HasForeignKey("FiscalYearPeriodId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("FiscalYear");
-
-                    b.Navigation("FiscalYearPeriod");
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.JournalLine", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.CostCenter", "CostCenter")
-                        .WithMany()
-                        .HasForeignKey("CostCenterId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("BIZ.Domain.Entities.Journal", "Journal")
-                        .WithMany("JournalLines")
-                        .HasForeignKey("JournalId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.LedgerAccount", "LedgerAccount")
-                        .WithMany()
-                        .HasForeignKey("LedgerAccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.SubLedger", "SubLedger")
-                        .WithMany()
-                        .HasForeignKey("SubLedgerId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CostCenter");
-
-                    b.Navigation("Journal");
-
-                    b.Navigation("LedgerAccount");
-
-                    b.Navigation("SubLedger");
-                });
-
             modelBuilder.Entity("BIZ.Domain.Entities.LedgerAccount", b =>
                 {
                     b.HasOne("BIZ.Domain.Entities.AccountSubGroup", "AccountSubGroup")
@@ -2393,11 +2233,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
             modelBuilder.Entity("BIZ.Domain.Entities.FiscalYear", b =>
                 {
                     b.Navigation("FiscalYearPeriods");
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.Journal", b =>
-                {
-                    b.Navigation("JournalLines");
                 });
 
             modelBuilder.Entity("BIZ.Domain.Entities.LedgerAccount", b =>

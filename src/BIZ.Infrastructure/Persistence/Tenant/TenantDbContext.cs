@@ -57,7 +57,10 @@ public class TenantDbContext : DbContext
     public DbSet<LedgerAccount> LedgerAccounts => Set<LedgerAccount>();
     public DbSet<SubLedger> SubLedgers => Set<SubLedger>();
     public DbSet<CostCenter> CostCenters => Set<CostCenter>();
-
+    public DbSet<FiscalYear> FiscalYears=> Set<FiscalYear>();
+    public DbSet<FiscalYearPeriod> FiscalYearPeriods=> Set<FiscalYearPeriod>();
+    public DbSet<Journal> Journals => Set<Journal>();
+    public DbSet<JournalLine> JournalLines => Set<JournalLine>();
 
 
     // ============================================================
@@ -1616,9 +1619,205 @@ modelBuilder.Entity<ProductUnit>(entity =>
         .OnDelete(DeleteBehavior.Restrict);
 });
 
+// ========================================================
+        // FiscalYear
+        // ========================================================
+        modelBuilder.Entity<FiscalYear>(entity =>
+{
+    entity.ToTable("FiscalYears");
 
+    entity.HasKey(x => x.Id);
 
+    entity.Property(x => x.Code)
+        .IsRequired()
+        .HasMaxLength(50);
 
+    entity.HasIndex(x => x.Code)
+        .IsUnique();
+
+    entity.Property(x => x.Name)
+        .IsRequired()
+        .HasMaxLength(200);
+
+    entity.HasIndex(x => x.Name)
+        .IsUnique();
+
+    entity.Property(x => x.StartDate)
+        .IsRequired();
+
+    entity.Property(x => x.EndDate)
+        .IsRequired();
+
+    entity.Property(x => x.IsCurrent)
+        .IsRequired();
+
+    entity.Property(x => x.IsClosed)
+        .IsRequired();
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+});
+
+// ========================================================
+        // FiscalYearPeriod
+        // ========================================================
+        modelBuilder.Entity<FiscalYearPeriod>(entity =>
+{
+    entity.ToTable("FiscalYearPeriods");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.Code)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.Code)
+        .IsUnique();
+
+    entity.Property(x => x.Name)
+        .IsRequired()
+        .HasMaxLength(200);
+
+    entity.HasIndex(x => new
+    {
+        x.FiscalYearId,
+        x.PeriodNumber
+    })
+    .IsUnique();
+
+    entity.Property(x => x.PeriodNumber)
+        .IsRequired();
+
+    entity.Property(x => x.StartDate)
+        .IsRequired();
+
+    entity.Property(x => x.EndDate)
+        .IsRequired();
+
+    entity.Property(x => x.IsCurrent)
+        .IsRequired();
+
+    entity.Property(x => x.IsClosed)
+        .IsRequired();
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.FiscalYear)
+        .WithMany(x => x.FiscalYearPeriods)
+        .HasForeignKey(x => x.FiscalYearId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+// ========================================================
+        // journal
+        // ========================================================
+       modelBuilder.Entity<Journal>(entity =>
+{
+    entity.ToTable("Journals");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.JournalNumber)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.JournalNumber)
+        .IsUnique();
+
+    entity.Property(x => x.JournalDate)
+        .IsRequired();
+
+    entity.Property(x => x.ReferenceNumber)
+        .HasMaxLength(100);
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.JournalType)
+        .IsRequired()
+        .HasMaxLength(30);
+
+    entity.Property(x => x.IsPosted)
+        .IsRequired();
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.FiscalYear)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.FiscalYearPeriod)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearPeriodId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+// ========================================================
+        // Journalline
+        // ========================================================
+      modelBuilder.Entity<JournalLine>(entity =>
+{
+    entity.ToTable("JournalLines");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.Debit)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.Credit)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.LineNumber)
+        .IsRequired();
+
+    entity.HasIndex(x => new
+    {
+        x.JournalId,
+        x.LineNumber
+    })
+    .IsUnique();
+
+    // Journal
+    entity.HasOne(x => x.Journal)
+        .WithMany(x => x.JournalLines)
+        .HasForeignKey(x => x.JournalId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    // Ledger Account
+    entity.HasOne(x => x.LedgerAccount)
+        .WithMany()
+        .HasForeignKey(x => x.LedgerAccountId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    // SubLedger
+    entity.HasOne(x => x.SubLedger)
+        .WithMany()
+        .HasForeignKey(x => x.SubLedgerId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    // CostCenter
+    entity.HasOne(x => x.CostCenter)
+        .WithMany()
+        .HasForeignKey(x => x.CostCenterId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
 
 
 

@@ -113,6 +113,10 @@ builder.Services.AddScoped<IAccountSubGroupService, AccountSubGroupService>();
 builder.Services.AddScoped<ILedgerAccountService,LedgerAccountService>();
 builder.Services.AddScoped<ISubLedgerService,SubLedgerService>();
 builder.Services.AddScoped<ICostCenterService, CostCenterService>();
+builder.Services.AddScoped<IFiscalYearService,FiscalYearService>();
+builder.Services.AddScoped<IFiscalYearPeriodService,FiscalYearPeriodService>();
+builder.Services.AddScoped< IJournalService,JournalService>();
+builder.Services.AddScoped<IJournalLineService,JournalLineService>();
 
 
 
