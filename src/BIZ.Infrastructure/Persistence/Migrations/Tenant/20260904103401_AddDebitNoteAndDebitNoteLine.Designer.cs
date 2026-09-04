@@ -4,6 +4,7 @@ using BIZ.Infrastructure.Persistence.Tenant;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260904103401_AddDebitNoteAndDebitNoteLine")]
+    partial class AddDebitNoteAndDebitNoteLine
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -358,109 +361,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                         .IsUnique();
 
                     b.ToTable("Brands", (string)null);
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.Budget", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("ApprovedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int?>("CostCenterId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("FiscalYearId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsApproved")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique();
-
-                    b.HasIndex("CostCenterId");
-
-                    b.HasIndex("FiscalYearId");
-
-                    b.ToTable("Budgets", (string)null);
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.BudgetLine", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("BudgetAmount")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<int>("BudgetId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CostCenterId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("LedgerAccountId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LineNumber")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("RevisedAmount")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CostCenterId");
-
-                    b.HasIndex("LedgerAccountId");
-
-                    b.HasIndex("BudgetId", "LineNumber")
-                        .IsUnique();
-
-                    b.ToTable("BudgetLines", (string)null);
                 });
 
             modelBuilder.Entity("BIZ.Domain.Entities.CashAccount", b =>
@@ -2701,50 +2601,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                     b.Navigation("LedgerAccount");
                 });
 
-            modelBuilder.Entity("BIZ.Domain.Entities.Budget", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.CostCenter", "CostCenter")
-                        .WithMany()
-                        .HasForeignKey("CostCenterId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("BIZ.Domain.Entities.FiscalYear", "FiscalYear")
-                        .WithMany()
-                        .HasForeignKey("FiscalYearId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CostCenter");
-
-                    b.Navigation("FiscalYear");
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.BudgetLine", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.Budget", "Budget")
-                        .WithMany("BudgetLines")
-                        .HasForeignKey("BudgetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.CostCenter", "CostCenter")
-                        .WithMany()
-                        .HasForeignKey("CostCenterId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("BIZ.Domain.Entities.LedgerAccount", "LedgerAccount")
-                        .WithMany()
-                        .HasForeignKey("LedgerAccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Budget");
-
-                    b.Navigation("CostCenter");
-
-                    b.Navigation("LedgerAccount");
-                });
-
             modelBuilder.Entity("BIZ.Domain.Entities.CashAccount", b =>
                 {
                     b.HasOne("BIZ.Domain.Entities.LedgerAccount", "LedgerAccount")
@@ -3254,11 +3110,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
             modelBuilder.Entity("BIZ.Domain.Entities.Brand", b =>
                 {
                     b.Navigation("Models");
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.Budget", b =>
-                {
-                    b.Navigation("BudgetLines");
                 });
 
             modelBuilder.Entity("BIZ.Domain.Entities.CreditNote", b =>

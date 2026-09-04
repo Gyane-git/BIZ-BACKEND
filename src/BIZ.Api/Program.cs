@@ -124,6 +124,10 @@ builder.Services.AddScoped<IPaymentService,PaymentService>();
 builder.Services.AddScoped<IReceiptService,ReceiptService>();
 builder.Services.AddScoped<ICreditNoteService, CreditNoteService>();
 builder.Services.AddScoped<ICreditNoteLineService, CreditNoteLineService>();
+builder.Services.AddScoped<IDebitNoteService, DebitNoteService>();
+builder.Services.AddScoped<IDebitNoteLineService,DebitNoteLineService>();
+builder.Services.AddScoped<IBudgetService, BudgetService>();
+builder.Services.AddScoped<IBudgetLineService, BudgetLineService>();
 
 
 // ============================================================

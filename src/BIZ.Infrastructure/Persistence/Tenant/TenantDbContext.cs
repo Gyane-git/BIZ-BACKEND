@@ -67,6 +67,10 @@ public class TenantDbContext : DbContext
     public DbSet<Receipt> Receipts => Set<Receipt>();
     public DbSet<CreditNote> CreditNotes => Set<CreditNote>();
     public DbSet<CreditNoteLine> CreditNoteLines => Set<CreditNoteLine>();
+    public DbSet<DebitNote> DebitNotes => Set<DebitNote>();
+    public DbSet<DebitNoteLine> DebitNoteLines => Set<DebitNoteLine>();
+    public DbSet<Budget> Budgets => Set<Budget>();
+    public DbSet<BudgetLine> BudgetLines => Set<BudgetLine>();
 
 
 
@@ -2178,7 +2182,228 @@ modelBuilder.Entity<CreditNoteLine>(entity =>
         .HasForeignKey(x => x.ProductId)
         .OnDelete(DeleteBehavior.Restrict);
 });
+// ========================================================
+        // DebitNote
+        // ========================================================
+       modelBuilder.Entity<DebitNote>(entity =>
+{
+    entity.ToTable("DebitNotes");
 
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.DebitNoteNumber)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.DebitNoteNumber)
+        .IsUnique();
+
+    entity.Property(x => x.DebitNoteDate)
+        .IsRequired();
+
+    entity.Property(x => x.ReferenceNumber)
+        .HasMaxLength(100);
+
+    entity.Property(x => x.Reason)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.TotalAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.IsPosted)
+        .IsRequired();
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.FiscalYear)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.FiscalYearPeriod)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearPeriodId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.LedgerAccount)
+        .WithMany()
+        .HasForeignKey(x => x.LedgerAccountId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.SubLedger)
+        .WithMany()
+        .HasForeignKey(x => x.SubLedgerId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasMany(x => x.DebitNoteLines)
+        .WithOne(x => x.DebitNote)
+        .HasForeignKey(x => x.DebitNoteId)
+        .OnDelete(DeleteBehavior.Cascade);
+});
+
+// ========================================================
+        // DebitNoteLine
+        // ========================================================
+
+
+modelBuilder.Entity<DebitNoteLine>(entity =>
+{
+    entity.ToTable("DebitNoteLines");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.Quantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.Rate)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.DiscountAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TaxableAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TaxAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.LineTotal)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.LineNumber)
+        .IsRequired();
+
+    entity.HasIndex(x => new
+    {
+        x.DebitNoteId,
+        x.LineNumber
+    })
+    .IsUnique();
+
+    entity.HasOne(x => x.DebitNote)
+        .WithMany(x => x.DebitNoteLines)
+        .HasForeignKey(x => x.DebitNoteId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    entity.HasOne(x => x.Product)
+        .WithMany()
+        .HasForeignKey(x => x.ProductId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+
+// ========================================================
+        // budget
+        // ========================================================
+      modelBuilder.Entity<Budget>(entity =>
+{
+    entity.ToTable("Budgets");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.Code)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.Code)
+        .IsUnique();
+
+    entity.Property(x => x.Name)
+        .IsRequired()
+        .HasMaxLength(250);
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.TotalAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.IsApproved)
+        .IsRequired();
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.FiscalYear)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.CostCenter)
+        .WithMany()
+        .HasForeignKey(x => x.CostCenterId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasMany(x => x.BudgetLines)
+        .WithOne(x => x.Budget)
+        .HasForeignKey(x => x.BudgetId)
+        .OnDelete(DeleteBehavior.Cascade);
+});
+
+// ========================================================
+        // BudgetLine
+        // ========================================================
+
+modelBuilder.Entity<BudgetLine>(entity =>
+{
+    entity.ToTable("BudgetLines");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.BudgetAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.RevisedAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.LineNumber)
+        .IsRequired();
+
+    entity.HasIndex(x => new
+    {
+        x.BudgetId,
+        x.LineNumber
+    })
+    .IsUnique();
+
+    entity.HasOne(x => x.Budget)
+        .WithMany(x => x.BudgetLines)
+        .HasForeignKey(x => x.BudgetId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    entity.HasOne(x => x.LedgerAccount)
+        .WithMany()
+        .HasForeignKey(x => x.LedgerAccountId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.CostCenter)
+        .WithMany()
+        .HasForeignKey(x => x.CostCenterId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
 
 
 
