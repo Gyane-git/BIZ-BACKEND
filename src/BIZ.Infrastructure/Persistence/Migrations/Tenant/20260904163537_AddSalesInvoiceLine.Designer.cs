@@ -4,6 +4,7 @@ using BIZ.Infrastructure.Persistence.Tenant;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260904163537_AddSalesInvoiceLine")]
+    partial class AddSalesInvoiceLine
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2771,118 +2774,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                     b.ToTable("SalesOrderLines", (string)null);
                 });
 
-            modelBuilder.Entity("BIZ.Domain.Entities.SalesPayment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<int?>("BankAccountId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CashAccountId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("FiscalYearId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FiscalYearPeriodId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("JournalId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PaymentMode")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<string>("PaymentNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("ReferenceNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FiscalYearId");
-
-                    b.HasIndex("FiscalYearPeriodId");
-
-                    b.HasIndex("PaymentNumber")
-                        .IsUnique();
-
-                    b.ToTable("SalesPayments", (string)null);
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.SalesPaymentAllocation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("AllocatedAmount")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("SalesInvoiceId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SalesPaymentId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SalesInvoiceId");
-
-                    b.HasIndex("SalesPaymentId", "SalesInvoiceId")
-                        .IsUnique();
-
-                    b.ToTable("SalesPaymentAllocations", (string)null);
-                });
-
             modelBuilder.Entity("BIZ.Domain.Entities.SalesQuotation", b =>
                 {
                     b.Property<int>("Id")
@@ -3032,157 +2923,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                         .IsUnique();
 
                     b.ToTable("SalesQuotationLines", (string)null);
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.SalesReturn", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("BranchId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("DeliveryChallanId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("DiscountAmount")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<int>("FiscalYearId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FiscalYearPeriodId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("GrandTotal")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<string>("Reason")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("ReferenceNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("ReturnDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ReturnNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int?>("SalesInvoiceId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<decimal>("SubTotal")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<decimal>("TaxAmount")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("WarehouseId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FiscalYearId");
-
-                    b.HasIndex("FiscalYearPeriodId");
-
-                    b.HasIndex("ReturnNumber")
-                        .IsUnique();
-
-                    b.ToTable("SalesReturns", (string)null);
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.SalesReturnLine", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<decimal>("DiscountAmount")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<decimal>("DiscountPercent")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<int>("LineNumber")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("LineTotal")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Quantity")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<int>("SalesReturnId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TaxAmount")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<decimal>("TaxPercent")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<int?>("UnitId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SalesReturnId", "LineNumber")
-                        .IsUnique();
-
-                    b.ToTable("SalesReturnLines", (string)null);
                 });
 
             modelBuilder.Entity("BIZ.Domain.Entities.SubLedger", b =>
@@ -4142,44 +3882,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                     b.Navigation("SalesOrder");
                 });
 
-            modelBuilder.Entity("BIZ.Domain.Entities.SalesPayment", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.FiscalYear", "FiscalYear")
-                        .WithMany()
-                        .HasForeignKey("FiscalYearId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.FiscalYearPeriod", "FiscalYearPeriod")
-                        .WithMany()
-                        .HasForeignKey("FiscalYearPeriodId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("FiscalYear");
-
-                    b.Navigation("FiscalYearPeriod");
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.SalesPaymentAllocation", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.SalesInvoice", "SalesInvoice")
-                        .WithMany()
-                        .HasForeignKey("SalesInvoiceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.SalesPayment", "SalesPayment")
-                        .WithMany("SalesPaymentAllocations")
-                        .HasForeignKey("SalesPaymentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SalesInvoice");
-
-                    b.Navigation("SalesPayment");
-                });
-
             modelBuilder.Entity("BIZ.Domain.Entities.SalesQuotation", b =>
                 {
                     b.HasOne("BIZ.Domain.Entities.FiscalYear", "FiscalYear")
@@ -4208,36 +3910,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                         .IsRequired();
 
                     b.Navigation("SalesQuotation");
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.SalesReturn", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.FiscalYear", "FiscalYear")
-                        .WithMany()
-                        .HasForeignKey("FiscalYearId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.FiscalYearPeriod", "FiscalYearPeriod")
-                        .WithMany()
-                        .HasForeignKey("FiscalYearPeriodId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("FiscalYear");
-
-                    b.Navigation("FiscalYearPeriod");
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.SalesReturnLine", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.SalesReturn", "SalesReturn")
-                        .WithMany("SalesReturnLines")
-                        .HasForeignKey("SalesReturnId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SalesReturn");
                 });
 
             modelBuilder.Entity("BIZ.Domain.Entities.SubLedger", b =>
@@ -4368,19 +4040,9 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                     b.Navigation("SalesOrderLines");
                 });
 
-            modelBuilder.Entity("BIZ.Domain.Entities.SalesPayment", b =>
-                {
-                    b.Navigation("SalesPaymentAllocations");
-                });
-
             modelBuilder.Entity("BIZ.Domain.Entities.SalesQuotation", b =>
                 {
                     b.Navigation("SalesQuotationLines");
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.SalesReturn", b =>
-                {
-                    b.Navigation("SalesReturnLines");
                 });
 
             modelBuilder.Entity("BIZ.Domain.Entities.Warehouse", b =>

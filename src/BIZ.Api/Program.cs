@@ -128,6 +128,18 @@ builder.Services.AddScoped<IDebitNoteService, DebitNoteService>();
 builder.Services.AddScoped<IDebitNoteLineService,DebitNoteLineService>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IBudgetLineService, BudgetLineService>();
+builder.Services.AddScoped<ISalesQuotationService, SalesQuotationService>();
+builder.Services.AddScoped<ISalesQuotationLineService,SalesQuotationLineService>();
+builder.Services.AddScoped<ISalesOrderService,SalesOrderService>();
+builder.Services.AddScoped<ISalesOrderLineService,SalesOrderLineService>();
+builder.Services.AddScoped<IDeliveryChallanService,DeliveryChallanService>();
+builder.Services.AddScoped<IDeliveryChallanLineService,DeliveryChallanLineService>();
+builder.Services.AddScoped<ISalesInvoiceService, SalesInvoiceService>();
+builder.Services.AddScoped<ISalesInvoiceLineService, SalesInvoiceLineService>();
+builder.Services.AddScoped<ISalesReturnService, SalesReturnService>();
+builder.Services.AddScoped<ISalesReturnLineService, SalesReturnLineService>();
+builder.Services.AddScoped<ISalesPaymentService, SalesPaymentService>();
+builder.Services.AddScoped<ISalesPaymentAllocationService, SalesPaymentAllocationService>();
 
 
 // ============================================================
