@@ -98,6 +98,8 @@ public class SalesPaymentService : ISalesPaymentService
 
     public async Task<SalesPaymentDto> CreateAsync(SalesPaymentDto dto)
     {
+        dto.PaymentNumber = dto.PaymentNumber?.Trim().ToUpperInvariant() ?? string.Empty;
+
         if (string.IsNullOrWhiteSpace(dto.PaymentNumber))
             throw new Exception("Payment number is required.");
 
@@ -140,7 +142,15 @@ public class SalesPaymentService : ISalesPaymentService
                 "Payment date is outside fiscal year period.");
         }
 
-        var mode = dto.PaymentMode.Trim();
+        var mode = string.IsNullOrWhiteSpace(dto.PaymentMode)
+            ? "Cash"
+            : dto.PaymentMode.Trim();
+
+        mode = mode.Equals("Bank", StringComparison.OrdinalIgnoreCase)
+            ? "Bank"
+            : mode.Equals("Cash", StringComparison.OrdinalIgnoreCase)
+                ? "Cash"
+                : mode;
 
         if (mode != "Cash" && mode != "Bank")
             throw new Exception(
@@ -184,6 +194,22 @@ public class SalesPaymentService : ISalesPaymentService
                 throw new Exception("Bank account not found.");
         }
 
+        if (dto.JournalId.HasValue)
+        {
+            var journal = await _context.Journals
+                .FirstOrDefaultAsync(x => x.Id == dto.JournalId.Value && x.IsActive);
+
+            if (journal == null)
+                throw new Exception("Journal not found.");
+
+            if (journal.IsPosted)
+                throw new Exception("Cannot attach sales payment to a posted journal.");
+
+            if (journal.FiscalYearId != dto.FiscalYearId ||
+                journal.FiscalYearPeriodId != dto.FiscalYearPeriodId)
+                throw new Exception("Journal fiscal year and period must match the payment.");
+        }
+
         if (dto.Allocations == null ||
             dto.Allocations.Count == 0)
         {
@@ -202,6 +228,9 @@ public class SalesPaymentService : ISalesPaymentService
             throw new Exception(
                 "Duplicate invoice allocation is not allowed.");
 
+        await using var transaction = await _context.Database.BeginTransactionAsync(
+            System.Data.IsolationLevel.Serializable);
+
         decimal allocationTotal = 0;
 
         foreach (var allocation in dto.Allocations)
@@ -219,12 +248,16 @@ public class SalesPaymentService : ISalesPaymentService
                 throw new Exception(
                     $"Sales invoice {allocation.SalesInvoiceId} not found.");
 
+            if (string.Equals(invoice.Status, "Draft", StringComparison.OrdinalIgnoreCase))
+                throw new Exception(
+                    $"Sales invoice {invoice.Id} must be posted before payment allocation.");
+
             if (invoice.CustomerId != dto.CustomerId)
                 throw new Exception(
                     "Invoice customer does not match payment customer.");
 
             var availableBalance =
-                invoice.GrandTotal - invoice.PaidAmount;
+                Math.Max(0m, invoice.GrandTotal - invoice.PaidAmount);
 
             if (allocation.AllocatedAmount > availableBalance)
             {
@@ -235,7 +268,7 @@ public class SalesPaymentService : ISalesPaymentService
             allocationTotal += allocation.AllocatedAmount;
         }
 
-        if (allocationTotal != dto.Amount)
+        if (Math.Abs(allocationTotal - dto.Amount) > 0.00000001m)
         {
             throw new Exception(
                 $"Payment amount ({dto.Amount}) must equal allocation total ({allocationTotal}).");
@@ -272,37 +305,32 @@ public class SalesPaymentService : ISalesPaymentService
                 });
         }
 
-        _context.SalesPayments.Add(payment);
-
-        await _context.SaveChangesAsync();
-
-        foreach (var allocation in payment.SalesPaymentAllocations)
+        try
         {
-            var invoice = await _context.SalesInvoices
-                .FirstAsync(x =>
-                    x.Id == allocation.SalesInvoiceId);
+            _context.SalesPayments.Add(payment);
+            await _context.SaveChangesAsync();
 
-            invoice.PaidAmount += allocation.AllocatedAmount;
-
-            invoice.BalanceAmount =
-                invoice.GrandTotal - invoice.PaidAmount;
-
-            if (invoice.BalanceAmount <= 0)
+            foreach (var allocation in payment.SalesPaymentAllocations)
             {
-                invoice.BalanceAmount = 0;
-                invoice.Status = "Paid";
-            }
-            else
-            {
-                invoice.Status = "PartiallyPaid";
+                var invoice = await _context.SalesInvoices
+                    .FirstAsync(x => x.Id == allocation.SalesInvoiceId && x.IsActive);
+
+                invoice.PaidAmount += allocation.AllocatedAmount;
+                invoice.BalanceAmount = Math.Max(0m, invoice.GrandTotal - invoice.PaidAmount);
+                invoice.Status = invoice.BalanceAmount == 0m ? "Paid" : "PartiallyPaid";
+                invoice.UpdatedAt = DateTime.UtcNow;
             }
 
-            invoice.UpdatedAt = DateTime.UtcNow;
+            payment.Status = "Posted";
+            payment.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
         }
-
-        payment.Status = "Posted";
-
-        await _context.SaveChangesAsync();
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
 
         return (await GetByIdAsync(payment.Id))!;
     }

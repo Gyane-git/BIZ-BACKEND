@@ -9,10 +9,12 @@ namespace BIZ.Infrastructure.Services;
 public class SalesInvoiceService : ISalesInvoiceService
 {
     private readonly TenantDbContext _context;
+    private readonly SalesPostingService _postingService;
 
-    public SalesInvoiceService(TenantDbContext context)
+    public SalesInvoiceService(TenantDbContext context, SalesPostingService postingService)
     {
         _context = context;
+        _postingService = postingService;
     }
 
     public async Task<IEnumerable<SalesInvoiceDto>> GetAllAsync()
@@ -390,6 +392,34 @@ public class SalesInvoiceService : ISalesInvoiceService
 
         await _context.SaveChangesAsync();
 
+        return true;
+    }
+
+    public async Task<bool> PostAsync(int id)
+    {
+        var invoice = await _context.SalesInvoices
+            .Include(x => x.SalesInvoiceLines)
+            .FirstOrDefaultAsync(x => x.Id == id && x.IsActive);
+
+        if (invoice == null)
+            return false;
+        if (!string.Equals(invoice.Status, "Draft", StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException("Only Draft sales invoices can be posted.");
+
+        await using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            await _postingService.PostInvoiceAsync(invoice);
+            invoice.Status = invoice.BalanceAmount == 0m ? "Paid" : "Posted";
+            invoice.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
         return true;
     }
 

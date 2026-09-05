@@ -128,4 +128,20 @@ public class SalesInvoiceController : ControllerBase
             });
         }
     }
+
+    [HttpPost("{id:int}/post")]
+    public async Task<IActionResult> Post(int id)
+    {
+        try
+        {
+            if (!await _service.PostAsync(id))
+                return NotFound(new { message = "Sales invoice not found." });
+
+            return Ok(new { message = "Sales invoice posted successfully." });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
 }

@@ -12,5 +12,7 @@ public interface ISalesReturnService
 
     Task<bool> UpdateAsync(int id, SalesReturnDto dto);
 
+    Task<bool> PostAsync(int id);
+
     Task<bool> DeleteAsync(int id);
 }

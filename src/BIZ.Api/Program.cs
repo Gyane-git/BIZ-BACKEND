@@ -140,6 +140,7 @@ builder.Services.AddScoped<ISalesReturnService, SalesReturnService>();
 builder.Services.AddScoped<ISalesReturnLineService, SalesReturnLineService>();
 builder.Services.AddScoped<ISalesPaymentService, SalesPaymentService>();
 builder.Services.AddScoped<ISalesPaymentAllocationService, SalesPaymentAllocationService>();
+builder.Services.AddScoped<SalesPostingService>();
 
 
 // ============================================================

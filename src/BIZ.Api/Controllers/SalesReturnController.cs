@@ -134,4 +134,20 @@ public class SalesReturnController : ControllerBase
             });
         }
     }
+
+    [HttpPost("{id:int}/post")]
+    public async Task<IActionResult> Post(int id)
+    {
+        try
+        {
+            if (!await _service.PostAsync(id))
+                return NotFound(new { message = "Sales return not found." });
+
+            return Ok(new { message = "Sales return posted successfully." });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
 }

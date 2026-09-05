@@ -21,6 +21,7 @@ public class SalesPaymentAllocationService
         GetAllAsync()
     {
         return await _context.SalesPaymentAllocations
+            .Where(x => x.SalesPayment.IsActive && x.SalesInvoice.IsActive)
             .OrderByDescending(x => x.Id)
             .Select(x => new SalesPaymentAllocationDto
             {
@@ -38,7 +39,7 @@ public class SalesPaymentAllocationService
         GetByIdAsync(int id)
     {
         return await _context.SalesPaymentAllocations
-            .Where(x => x.Id == id)
+            .Where(x => x.Id == id && x.SalesPayment.IsActive && x.SalesInvoice.IsActive)
             .Select(x => new SalesPaymentAllocationDto
             {
                 Id = x.Id,
@@ -83,6 +84,9 @@ public class SalesPaymentAllocationService
 
         if (invoice == null)
             throw new Exception("Sales invoice not found.");
+
+        if (string.Equals(invoice.Status, "Draft", StringComparison.OrdinalIgnoreCase))
+            throw new Exception("Sales invoice must be posted before payment allocation.");
 
         if (invoice.CustomerId != payment.CustomerId)
             throw new Exception(
@@ -154,6 +158,30 @@ public class SalesPaymentAllocationService
             throw new Exception(
                 "Allocated amount must be greater than zero.");
 
+        if (dto.SalesPaymentId != allocation.SalesPaymentId ||
+            dto.SalesInvoiceId != allocation.SalesInvoiceId)
+            throw new Exception("Payment and invoice cannot be changed for an allocation.");
+
+        var invoice = await _context.SalesInvoices
+            .FirstOrDefaultAsync(x => x.Id == allocation.SalesInvoiceId && x.IsActive);
+
+        if (invoice == null || invoice.CustomerId != allocation.SalesPayment.CustomerId)
+            throw new Exception("Sales invoice does not belong to payment customer.");
+
+        var duplicateAmount = await _context.SalesPaymentAllocations
+            .Where(x => x.SalesPaymentId == allocation.SalesPaymentId && x.Id != id)
+            .SumAsync(x => (decimal?)x.AllocatedAmount) ?? 0m;
+
+        if (duplicateAmount + dto.AllocatedAmount > allocation.SalesPayment.Amount)
+            throw new Exception("Allocation total cannot exceed payment amount.");
+
+        var invoiceAllocated = await _context.SalesPaymentAllocations
+            .Where(x => x.SalesInvoiceId == invoice.Id && x.Id != id && x.SalesPayment.Status == "Posted")
+            .SumAsync(x => (decimal?)x.AllocatedAmount) ?? 0m;
+
+        if (invoiceAllocated + dto.AllocatedAmount > invoice.GrandTotal)
+            throw new Exception("Allocated amount exceeds invoice balance.");
+
         allocation.AllocatedAmount = dto.AllocatedAmount;
         allocation.Notes = dto.Notes;
 
@@ -167,6 +195,7 @@ public class SalesPaymentAllocationService
         var allocation =
             await _context.SalesPaymentAllocations
                 .Include(x => x.SalesPayment)
+                .Include(x => x.SalesInvoice)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
         if (allocation == null)

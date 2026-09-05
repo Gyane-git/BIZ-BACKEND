@@ -9,10 +9,12 @@ namespace BIZ.Infrastructure.Services;
 public class SalesReturnService : ISalesReturnService
 {
     private readonly TenantDbContext _context;
+    private readonly SalesPostingService _postingService;
 
-    public SalesReturnService(TenantDbContext context)
+    public SalesReturnService(TenantDbContext context, SalesPostingService postingService)
     {
         _context = context;
+        _postingService = postingService;
     }
 
     public async Task<IEnumerable<SalesReturnDto>> GetAllAsync()
@@ -419,6 +421,34 @@ public class SalesReturnService : ISalesReturnService
 
         await _context.SaveChangesAsync();
 
+        return true;
+    }
+
+    public async Task<bool> PostAsync(int id)
+    {
+        var salesReturn = await _context.SalesReturns
+            .Include(x => x.SalesReturnLines)
+            .FirstOrDefaultAsync(x => x.Id == id && x.IsActive);
+
+        if (salesReturn == null)
+            return false;
+        if (!string.Equals(salesReturn.Status, "Draft", StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException("Only Draft sales returns can be posted.");
+
+        await using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            await _postingService.PostReturnAsync(salesReturn);
+            salesReturn.Status = "Posted";
+            salesReturn.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
         return true;
     }
 

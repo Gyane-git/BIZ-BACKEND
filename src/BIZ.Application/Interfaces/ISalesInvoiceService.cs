@@ -12,5 +12,7 @@ public interface ISalesInvoiceService
 
     Task<bool> UpdateAsync(int id, SalesInvoiceDto dto);
 
+    Task<bool> PostAsync(int id);
+
     Task<bool> DeleteAsync(int id);
 }
