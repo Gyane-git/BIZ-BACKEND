@@ -147,6 +147,16 @@ builder.Services.AddScoped<IPurchaseQuotationService, PurchaseQuotationService>(
 builder.Services.AddScoped<IPurchaseQuotationLineService,PurchaseQuotationLineService>();
 builder.Services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
 builder.Services.AddScoped< IPurchaseOrderLineService,PurchaseOrderLineService>();
+builder.Services.AddScoped<IGoodsReceiptService, GoodsReceiptService>();
+builder.Services.AddScoped< IGoodsReceiptLineService,GoodsReceiptLineService>();
+builder.Services.AddScoped< IPurchaseInvoiceService,PurchaseInvoiceService>();
+builder.Services.AddScoped<IPurchaseInvoiceLineService,PurchaseInvoiceLineService>();
+builder.Services.AddScoped<IPurchaseReturnService,PurchaseReturnService>();
+builder.Services.AddScoped<IPurchaseReturnLineService,PurchaseReturnLineService>();
+builder.Services.AddScoped<IPurchasePaymentService,PurchasePaymentService>();
+builder.Services.AddScoped< IPurchasePaymentAllocationService,PurchasePaymentAllocationService>();
+builder.Services.AddScoped<IStockBalanceService,StockBalanceService>();
+builder.Services.AddScoped<IStockTransactionService,StockTransactionService>();
 
 
 // ============================================================

@@ -4,6 +4,7 @@ using BIZ.Infrastructure.Persistence.Tenant;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260905155906_AddPurchaseInvoice")]
+    partial class AddPurchaseInvoice
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2781,133 +2784,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                     b.ToTable("PurchaseOrderLines", (string)null);
                 });
 
-            modelBuilder.Entity("BIZ.Domain.Entities.PurchasePayment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<int?>("BankAccountId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CashAccountId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("FiscalYearId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FiscalYearPeriodId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPosted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("JournalId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PaymentMode")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<string>("PaymentNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime?>("PostedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ReferenceNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("SupplierId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BankAccountId");
-
-                    b.HasIndex("CashAccountId");
-
-                    b.HasIndex("FiscalYearId");
-
-                    b.HasIndex("FiscalYearPeriodId");
-
-                    b.HasIndex("JournalId");
-
-                    b.HasIndex("PaymentNumber")
-                        .IsUnique();
-
-                    b.HasIndex("SupplierId");
-
-                    b.ToTable("PurchasePayments", (string)null);
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.PurchasePaymentAllocation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("AllocatedAmount")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("PurchaseInvoiceId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PurchasePaymentId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PurchaseInvoiceId");
-
-                    b.HasIndex("PurchasePaymentId", "PurchaseInvoiceId")
-                        .IsUnique();
-
-                    b.ToTable("PurchasePaymentAllocations", (string)null);
-                });
-
             modelBuilder.Entity("BIZ.Domain.Entities.PurchaseQuotation", b =>
                 {
                     b.Property<int>("Id")
@@ -3171,184 +3047,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                         .IsUnique();
 
                     b.ToTable("PurchaseRequestLines", (string)null);
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.PurchaseReturn", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("BranchId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("CurrencyId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("DiscountAmount")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<decimal>("ExchangeRate")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<int>("FiscalYearId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FiscalYearPeriodId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("GoodsReceiptId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("GrandTotal")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPosted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<DateTime?>("PostedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("PurchaseInvoiceId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ReferenceNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("ReturnDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ReturnNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<decimal>("SubTotal")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<string>("SupplierCreditNoteNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("SupplierId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TaxAmount")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("WarehouseId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FiscalYearId");
-
-                    b.HasIndex("FiscalYearPeriodId");
-
-                    b.HasIndex("GoodsReceiptId");
-
-                    b.HasIndex("PurchaseInvoiceId");
-
-                    b.HasIndex("ReturnNumber")
-                        .IsUnique();
-
-                    b.ToTable("PurchaseReturns", (string)null);
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.PurchaseReturnLine", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<decimal>("DiscountAmount")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<decimal>("DiscountPercent")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<int?>("GoodsReceiptLineId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LineNumber")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("LineTotal")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("PurchaseInvoiceLineId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PurchaseReturnId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Quantity")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<decimal>("TaxAmount")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<decimal>("TaxPercent")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<int?>("UnitId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GoodsReceiptLineId");
-
-                    b.HasIndex("PurchaseInvoiceLineId");
-
-                    b.HasIndex("PurchaseReturnId", "LineNumber")
-                        .IsUnique();
-
-                    b.ToTable("PurchaseReturnLines", (string)null);
                 });
 
             modelBuilder.Entity("BIZ.Domain.Entities.Rack", b =>
@@ -4240,147 +3938,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                         .IsUnique();
 
                     b.ToTable("SalesReturnLines", (string)null);
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.StockBalance", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("AvailableQuantity")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<decimal>("AverageCost")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<int?>("BranchId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Quantity")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<decimal>("ReservedQuantity")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<decimal>("StockValue")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("WarehouseId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId", "WarehouseId", "BranchId")
-                        .IsUnique()
-                        .HasFilter("[WarehouseId] IS NOT NULL AND [BranchId] IS NOT NULL");
-
-                    b.ToTable("StockBalances", (string)null);
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.StockTransaction", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("BalanceQuantity")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<int?>("BranchId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int?>("FiscalYearId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("FiscalYearPeriodId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("QuantityIn")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<decimal>("QuantityOut")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<int?>("ReferenceId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ReferenceNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("ReferenceType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<decimal>("TotalCost")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<DateTime>("TransactionDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("TransactionType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<decimal>("UnitCost")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<int?>("WarehouseId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FiscalYearId");
-
-                    b.HasIndex("FiscalYearPeriodId");
-
-                    b.HasIndex("ReferenceType", "ReferenceId");
-
-                    b.HasIndex("ProductId", "WarehouseId", "TransactionDate");
-
-                    b.ToTable("StockTransactions", (string)null);
                 });
 
             modelBuilder.Entity("BIZ.Domain.Entities.SubLedger", b =>
@@ -5358,66 +4915,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                     b.Navigation("PurchaseOrder");
                 });
 
-            modelBuilder.Entity("BIZ.Domain.Entities.PurchasePayment", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.BankAccount", null)
-                        .WithMany()
-                        .HasForeignKey("BankAccountId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("BIZ.Domain.Entities.CashAccount", null)
-                        .WithMany()
-                        .HasForeignKey("CashAccountId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("BIZ.Domain.Entities.FiscalYear", "FiscalYear")
-                        .WithMany()
-                        .HasForeignKey("FiscalYearId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.FiscalYearPeriod", "FiscalYearPeriod")
-                        .WithMany()
-                        .HasForeignKey("FiscalYearPeriodId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.Journal", null)
-                        .WithMany()
-                        .HasForeignKey("JournalId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.Supplier", null)
-                        .WithMany()
-                        .HasForeignKey("SupplierId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("FiscalYear");
-
-                    b.Navigation("FiscalYearPeriod");
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.PurchasePaymentAllocation", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.PurchaseInvoice", "PurchaseInvoice")
-                        .WithMany()
-                        .HasForeignKey("PurchaseInvoiceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.PurchasePayment", "PurchasePayment")
-                        .WithMany("PurchasePaymentAllocations")
-                        .HasForeignKey("PurchasePaymentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PurchaseInvoice");
-
-                    b.Navigation("PurchasePayment");
-                });
-
             modelBuilder.Entity("BIZ.Domain.Entities.PurchaseQuotation", b =>
                 {
                     b.HasOne("BIZ.Domain.Entities.FiscalYear", "FiscalYear")
@@ -5476,60 +4973,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                         .IsRequired();
 
                     b.Navigation("PurchaseRequest");
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.PurchaseReturn", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.FiscalYear", "FiscalYear")
-                        .WithMany()
-                        .HasForeignKey("FiscalYearId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.FiscalYearPeriod", "FiscalYearPeriod")
-                        .WithMany()
-                        .HasForeignKey("FiscalYearPeriodId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.GoodsReceipt", null)
-                        .WithMany()
-                        .HasForeignKey("GoodsReceiptId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("BIZ.Domain.Entities.PurchaseInvoice", null)
-                        .WithMany()
-                        .HasForeignKey("PurchaseInvoiceId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("FiscalYear");
-
-                    b.Navigation("FiscalYearPeriod");
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.PurchaseReturnLine", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.GoodsReceiptLine", "GoodsReceiptLine")
-                        .WithMany()
-                        .HasForeignKey("GoodsReceiptLineId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("BIZ.Domain.Entities.PurchaseInvoiceLine", "PurchaseInvoiceLine")
-                        .WithMany()
-                        .HasForeignKey("PurchaseInvoiceLineId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("BIZ.Domain.Entities.PurchaseReturn", "PurchaseReturn")
-                        .WithMany("PurchaseReturnLines")
-                        .HasForeignKey("PurchaseReturnId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("GoodsReceiptLine");
-
-                    b.Navigation("PurchaseInvoiceLine");
-
-                    b.Navigation("PurchaseReturn");
                 });
 
             modelBuilder.Entity("BIZ.Domain.Entities.Rack", b =>
@@ -5740,42 +5183,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                     b.Navigation("SalesReturn");
                 });
 
-            modelBuilder.Entity("BIZ.Domain.Entities.StockBalance", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.StockTransaction", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.FiscalYear", "FiscalYear")
-                        .WithMany()
-                        .HasForeignKey("FiscalYearId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("BIZ.Domain.Entities.FiscalYearPeriod", "FiscalYearPeriod")
-                        .WithMany()
-                        .HasForeignKey("FiscalYearPeriodId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("BIZ.Domain.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("FiscalYear");
-
-                    b.Navigation("FiscalYearPeriod");
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("BIZ.Domain.Entities.SubLedger", b =>
                 {
                     b.HasOne("BIZ.Domain.Entities.LedgerAccount", "LedgerAccount")
@@ -5909,11 +5316,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                     b.Navigation("PurchaseOrderLines");
                 });
 
-            modelBuilder.Entity("BIZ.Domain.Entities.PurchasePayment", b =>
-                {
-                    b.Navigation("PurchasePaymentAllocations");
-                });
-
             modelBuilder.Entity("BIZ.Domain.Entities.PurchaseQuotation", b =>
                 {
                     b.Navigation("PurchaseQuotationLines");
@@ -5922,11 +5324,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
             modelBuilder.Entity("BIZ.Domain.Entities.PurchaseRequest", b =>
                 {
                     b.Navigation("PurchaseRequestLines");
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.PurchaseReturn", b =>
-                {
-                    b.Navigation("PurchaseReturnLines");
                 });
 
             modelBuilder.Entity("BIZ.Domain.Entities.SalesInvoice", b =>

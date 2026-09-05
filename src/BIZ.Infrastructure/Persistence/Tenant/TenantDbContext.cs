@@ -91,6 +91,18 @@ public class TenantDbContext : DbContext
     public DbSet<PurchaseQuotationLine> PurchaseQuotationLines { get; set; }
     public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
     public DbSet<PurchaseOrderLine> PurchaseOrderLines { get; set; }
+    public DbSet<GoodsReceipt> GoodsReceipts { get; set; }
+    public DbSet<GoodsReceiptLine> GoodsReceiptLines { get; set; }
+    public DbSet<PurchaseInvoice> PurchaseInvoices { get; set; }
+    public DbSet<PurchaseInvoiceLine> PurchaseInvoiceLines { get; set; }
+    public DbSet<PurchaseReturn> PurchaseReturns { get; set; }
+    public DbSet<PurchaseReturnLine> PurchaseReturnLines { get; set; }
+    public DbSet<PurchasePayment> PurchasePayments { get; set; }
+    public DbSet<PurchasePaymentAllocation> PurchasePaymentAllocations { get; set; }
+
+    
+    public DbSet<StockBalance> StockBalances { get; set; }
+    public DbSet<StockTransaction> StockTransactions { get; set; }
 
 
 
@@ -3490,6 +3502,697 @@ modelBuilder.Entity<SalesPaymentAllocation>(entity =>
         .HasForeignKey(x => x.PurchaseOrderId)
         .OnDelete(DeleteBehavior.Cascade);
 });
+
+//========================================================
+        // GoodsReceipt
+        // ========================================================
+       modelBuilder.Entity<GoodsReceipt>(entity =>
+{
+    entity.ToTable("GoodsReceipts");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.ReceiptNumber)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.ReceiptNumber)
+        .IsUnique();
+
+    entity.Property(x => x.ReceiptDate)
+        .IsRequired();
+
+    entity.Property(x => x.ReferenceNumber)
+        .HasMaxLength(100);
+
+    entity.Property(x => x.Notes)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.Status)
+        .IsRequired()
+        .HasMaxLength(30);
+
+    entity.Property(x => x.SubTotal)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.DiscountAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TaxAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.GrandTotal)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.FiscalYear)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.FiscalYearPeriod)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearPeriodId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne<PurchaseOrder>()
+        .WithMany()
+        .HasForeignKey(x => x.PurchaseOrderId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasMany(x => x.GoodsReceiptLines)
+        .WithOne(x => x.GoodsReceipt)
+        .HasForeignKey(x => x.GoodsReceiptId)
+        .OnDelete(DeleteBehavior.Cascade);
+});
+
+
+// ========================================================
+        // GoodsReceiptLine
+        // ========================================================
+       modelBuilder.Entity<GoodsReceiptLine>(entity =>
+{
+    entity.ToTable("GoodsReceiptLines");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.OrderedQuantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.ReceivedQuantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.UnitPrice)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.DiscountPercent)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.DiscountAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TaxPercent)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TaxAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.LineTotal)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.LineNumber)
+        .IsRequired();
+
+    entity.HasIndex(x => new
+    {
+        x.GoodsReceiptId,
+        x.LineNumber
+    }).IsUnique();
+
+    entity.HasOne(x => x.GoodsReceipt)
+        .WithMany(x => x.GoodsReceiptLines)
+        .HasForeignKey(x => x.GoodsReceiptId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    entity.HasOne(x => x.PurchaseOrderLine)
+        .WithMany()
+        .HasForeignKey(x => x.PurchaseOrderLineId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+// ========================================================
+        // PurchaseInvoice
+        // ========================================================
+       modelBuilder.Entity<PurchaseInvoice>(entity =>
+{
+    entity.ToTable("PurchaseInvoices");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.InvoiceNumber)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.InvoiceNumber)
+        .IsUnique();
+
+    entity.Property(x => x.InvoiceDate)
+        .IsRequired();
+
+    entity.Property(x => x.SupplierInvoiceNumber)
+        .HasMaxLength(100);
+
+    entity.Property(x => x.ExchangeRate)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.SubTotal)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.DiscountAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TaxAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.GrandTotal)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.Status)
+        .IsRequired()
+        .HasMaxLength(30);
+
+    entity.Property(x => x.ReferenceNumber)
+        .HasMaxLength(100);
+
+    entity.Property(x => x.Notes)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.IsPosted)
+        .IsRequired();
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.FiscalYear)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.FiscalYearPeriod)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearPeriodId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne<PurchaseOrder>()
+        .WithMany()
+        .HasForeignKey(x => x.PurchaseOrderId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne<GoodsReceipt>()
+        .WithMany()
+        .HasForeignKey(x => x.GoodsReceiptId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasMany(x => x.PurchaseInvoiceLines)
+        .WithOne(x => x.PurchaseInvoice)
+        .HasForeignKey(x => x.PurchaseInvoiceId)
+        .OnDelete(DeleteBehavior.Cascade);
+});
+
+// ========================================================
+        // PurchaseInvoiceLine
+        // ========================================================
+     modelBuilder.Entity<PurchaseInvoiceLine>(entity =>
+{
+    entity.ToTable("PurchaseInvoiceLines");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.Quantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.UnitPrice)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.DiscountPercent)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.DiscountAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TaxPercent)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TaxAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.LineTotal)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.LineNumber)
+        .IsRequired();
+
+    entity.HasIndex(x => new
+    {
+        x.PurchaseInvoiceId,
+        x.LineNumber
+    }).IsUnique();
+
+    entity.HasOne(x => x.PurchaseInvoice)
+        .WithMany(x => x.PurchaseInvoiceLines)
+        .HasForeignKey(x => x.PurchaseInvoiceId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    entity.HasOne(x => x.GoodsReceiptLine)
+        .WithMany()
+        .HasForeignKey(x => x.GoodsReceiptLineId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.PurchaseOrderLine)
+        .WithMany()
+        .HasForeignKey(x => x.PurchaseOrderLineId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+
+// ========================================================
+        // PurchaseReturn
+        // ========================================================
+       modelBuilder.Entity<PurchaseReturn>(entity =>
+{
+    entity.ToTable("PurchaseReturns");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.ReturnNumber)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.ReturnNumber)
+        .IsUnique();
+
+    entity.Property(x => x.ReturnDate)
+        .IsRequired();
+
+    entity.Property(x => x.SupplierCreditNoteNumber)
+        .HasMaxLength(100);
+
+    entity.Property(x => x.ExchangeRate)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.SubTotal)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.DiscountAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TaxAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.GrandTotal)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.Status)
+        .IsRequired()
+        .HasMaxLength(30);
+
+    entity.Property(x => x.ReferenceNumber)
+        .HasMaxLength(100);
+
+    entity.Property(x => x.Notes)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.IsPosted)
+        .IsRequired();
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.FiscalYear)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.FiscalYearPeriod)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearPeriodId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne<PurchaseInvoice>()
+        .WithMany()
+        .HasForeignKey(x => x.PurchaseInvoiceId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne<GoodsReceipt>()
+        .WithMany()
+        .HasForeignKey(x => x.GoodsReceiptId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasMany(x => x.PurchaseReturnLines)
+        .WithOne(x => x.PurchaseReturn)
+        .HasForeignKey(x => x.PurchaseReturnId)
+        .OnDelete(DeleteBehavior.Cascade);
+});
+
+// ========================================================
+        // PurchaseReturnLine
+        // ========================================================
+       modelBuilder.Entity<PurchaseReturnLine>(entity =>
+{
+    entity.ToTable("PurchaseReturnLines");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.Quantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.UnitPrice)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.DiscountPercent)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.DiscountAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TaxPercent)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TaxAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.LineTotal)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.LineNumber)
+        .IsRequired();
+
+    entity.HasIndex(x => new
+    {
+        x.PurchaseReturnId,
+        x.LineNumber
+    }).IsUnique();
+
+    entity.HasOne(x => x.PurchaseReturn)
+        .WithMany(x => x.PurchaseReturnLines)
+        .HasForeignKey(x => x.PurchaseReturnId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    entity.HasOne(x => x.PurchaseInvoiceLine)
+        .WithMany()
+        .HasForeignKey(x => x.PurchaseInvoiceLineId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.GoodsReceiptLine)
+        .WithMany()
+        .HasForeignKey(x => x.GoodsReceiptLineId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+// ========================================================
+        // PurchasePayment
+        // ========================================================
+       modelBuilder.Entity<PurchasePayment>(entity =>
+{
+    entity.ToTable("PurchasePayments");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.PaymentNumber)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.PaymentNumber)
+        .IsUnique();
+
+    entity.Property(x => x.PaymentDate)
+        .IsRequired();
+
+    entity.Property(x => x.Amount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.PaymentMode)
+        .IsRequired()
+        .HasMaxLength(30);
+
+    entity.Property(x => x.ReferenceNumber)
+        .HasMaxLength(100);
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.IsPosted)
+        .IsRequired();
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.FiscalYear)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.FiscalYearPeriod)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearPeriodId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne<Journal>()
+        .WithMany()
+        .HasForeignKey(x => x.JournalId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne<Supplier>()
+        .WithMany()
+        .HasForeignKey(x => x.SupplierId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne<CashAccount>()
+        .WithMany()
+        .HasForeignKey(x => x.CashAccountId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne<BankAccount>()
+        .WithMany()
+        .HasForeignKey(x => x.BankAccountId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasMany(x => x.PurchasePaymentAllocations)
+        .WithOne(x => x.PurchasePayment)
+        .HasForeignKey(x => x.PurchasePaymentId)
+        .OnDelete(DeleteBehavior.Cascade);
+});
+
+// ========================================================
+        // PurchasePyamentAllocation
+        // ========================================================
+
+modelBuilder.Entity<PurchasePaymentAllocation>(entity =>
+{
+    entity.ToTable("PurchasePaymentAllocations");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.AllocatedAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.Notes)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.PurchasePayment)
+        .WithMany(x => x.PurchasePaymentAllocations)
+        .HasForeignKey(x => x.PurchasePaymentId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    entity.HasOne(x => x.PurchaseInvoice)
+        .WithMany()
+        .HasForeignKey(x => x.PurchaseInvoiceId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasIndex(x => new
+    {
+        x.PurchasePaymentId,
+        x.PurchaseInvoiceId
+    })
+    .IsUnique();
+});
+
+// ========================================================
+        // StockBalance
+        // ========================================================
+       modelBuilder.Entity<StockBalance>(entity =>
+{
+    entity.ToTable("StockBalances");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.Quantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.ReservedQuantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.AvailableQuantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.AverageCost)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.StockValue)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.Product)
+        .WithMany()
+        .HasForeignKey(x => x.ProductId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasIndex(x => new
+    {
+        x.ProductId,
+        x.WarehouseId,
+        x.BranchId
+    })
+    .IsUnique();
+});
+
+// ========================================================
+        // StockTransaction
+        // ========================================================
+      modelBuilder.Entity<StockTransaction>(entity =>
+{
+    entity.ToTable("StockTransactions");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.TransactionType)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.Property(x => x.ReferenceType)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.Property(x => x.ReferenceNumber)
+        .HasMaxLength(100);
+
+    entity.Property(x => x.QuantityIn)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.QuantityOut)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.BalanceQuantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.UnitCost)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TotalCost)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.Product)
+        .WithMany()
+        .HasForeignKey(x => x.ProductId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.FiscalYear)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.FiscalYearPeriod)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearPeriodId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasIndex(x => new
+    {
+        x.ProductId,
+        x.WarehouseId,
+        x.TransactionDate
+    });
+
+    entity.HasIndex(x => new
+    {
+        x.ReferenceType,
+        x.ReferenceId
+    });
+});
+
+       
+
 
 
     }
