@@ -7,5 +7,6 @@ public interface IJwtService
         string username,
         int companyId,
         string companyCode,
-        string companyName);
+        string companyName,
+        IEnumerable<string>? roles = null);
 }

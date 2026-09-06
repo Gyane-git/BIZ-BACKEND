@@ -83,6 +83,8 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddDbContext<TenantDbContext>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IMasterRegistryService, MasterRegistryService>();
+builder.Services.AddScoped<TenantDatabaseProvisioner>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IBranchService, BranchService>();
 builder.Services.AddScoped<ICompanyUnitService, CompanyUnitService>();
@@ -197,6 +199,11 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider
         .GetRequiredService<MasterRegistryDbContext>();
 
+    if (app.Environment.IsDevelopment())
+    {
+        await db.Database.MigrateAsync();
+    }
+
     await UserSeeder.SeedAdminUserAsync(db);
 }
 
@@ -214,6 +221,8 @@ if (app.Environment.IsDevelopment())
 
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseAuthentication();
 

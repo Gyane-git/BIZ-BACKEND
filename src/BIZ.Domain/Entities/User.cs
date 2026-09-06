@@ -20,4 +20,6 @@ public class User
 
     // Navigation property
     public Company Company { get; set; } = null!;
+    public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }

@@ -10,6 +10,8 @@ public class LoginResponse
 
     public int ExpiresIn { get; set; }
 
+    public string RefreshToken { get; set; } = string.Empty;
+
     public UserInfo? User { get; set; }
 }
 

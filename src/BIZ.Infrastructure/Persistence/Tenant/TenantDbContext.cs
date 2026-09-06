@@ -139,15 +139,37 @@ public class TenantDbContext : DbContext
             );
         }
 
+        var databaseServer = NormalizeServer(_tenantContext.DatabaseServer);
+        var databaseName = _tenantContext.DatabaseName?.Trim();
+
+        if (string.IsNullOrWhiteSpace(databaseServer))
+            throw new InvalidOperationException("Tenant database server is not configured.");
+
+        if (string.IsNullOrWhiteSpace(databaseName))
+            throw new InvalidOperationException("Tenant database name is not configured.");
+
         var connectionString =
-            $"Server={_tenantContext.DatabaseServer},1433;" +
-            $"Database={_tenantContext.DatabaseName};" +
+            $"Server={databaseServer};" +
+            $"Database={databaseName};" +
             $"User Id=sa;" +
             $"Password=BIZSql@2026Strong!;" +
             $"TrustServerCertificate=True;" +
             $"Encrypt=False";
 
         optionsBuilder.UseSqlServer(connectionString);
+    }
+
+    private static string NormalizeServer(string server)
+    {
+        var value = server?.Trim() ?? string.Empty;
+        if (value.Length == 0)
+            return value;
+
+        // Keep an explicitly supplied port or named instance intact.
+        if (value.Contains(',') || value.Contains('\\'))
+            return value;
+
+        return $"{value},1433";
     }
 
     // ============================================================

@@ -34,7 +34,8 @@ public class TenantResolutionMiddleware
         // CompanyCode comes from request body
         // ============================================================
 
-        if (context.Request.Path.StartsWithSegments("/api/Auth/login"))
+        if (context.Request.Path.StartsWithSegments("/api/Auth/login") ||
+            context.Request.Path.StartsWithSegments("/api/Auth/refresh"))
         {
             await _next(context);
             return;

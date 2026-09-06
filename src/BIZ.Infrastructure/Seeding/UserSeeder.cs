@@ -28,8 +28,29 @@ public static class UserSeeder
                 x.CompanyId == company.Id &&
                 x.Username == username);
 
+        var adminRole = await db.Roles.FirstOrDefaultAsync(x => x.Code == "ADMIN");
+        if (adminRole == null)
+        {
+            adminRole = new Role
+            {
+                Code = "ADMIN",
+                Name = "Administrator",
+                Description = "Full Master Registry administration access.",
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
+            db.Roles.Add(adminRole);
+            await db.SaveChangesAsync();
+        }
+
         if (existingUser != null)
         {
+            var assigned = await db.UserRoles.AnyAsync(x => x.UserId == existingUser.Id && x.RoleId == adminRole.Id);
+            if (!assigned)
+            {
+                db.UserRoles.Add(new UserRole { UserId = existingUser.Id, RoleId = adminRole.Id, CreatedAt = DateTime.UtcNow });
+                await db.SaveChangesAsync();
+            }
             return;
         }
 
@@ -47,6 +68,8 @@ public static class UserSeeder
 
         db.Users.Add(user);
 
+        await db.SaveChangesAsync();
+        db.UserRoles.Add(new UserRole { UserId = user.Id, RoleId = adminRole.Id, CreatedAt = DateTime.UtcNow });
         await db.SaveChangesAsync();
     }
 }
