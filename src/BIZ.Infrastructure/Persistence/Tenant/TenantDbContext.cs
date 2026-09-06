@@ -100,9 +100,17 @@ public class TenantDbContext : DbContext
     public DbSet<PurchasePayment> PurchasePayments { get; set; }
     public DbSet<PurchasePaymentAllocation> PurchasePaymentAllocations { get; set; }
 
-    
+
     public DbSet<StockBalance> StockBalances { get; set; }
     public DbSet<StockTransaction> StockTransactions { get; set; }
+    public DbSet<StockAdjustment> StockAdjustments { get; set; }
+    public DbSet<StockAdjustmentLine> StockAdjustmentLines { get; set; }
+    public DbSet<StockTransfer> StockTransfers { get; set; }
+    public DbSet<StockTransferLine> StockTransferLines { get; set; }
+    public DbSet<StockCount> StockCounts { get; set; }
+    public DbSet<StockCountLine> StockCountLines { get; set; }
+    public DbSet<StockOpening> StockOpenings { get; set; }
+    public DbSet<StockOpeningLine> StockOpeningLines { get; set; }
 
 
 
@@ -4191,9 +4199,464 @@ modelBuilder.Entity<PurchasePaymentAllocation>(entity =>
     });
 });
 
-       
+
+// ========================================================
+        // StockAdjustment
+        // ========================================================
+      modelBuilder.Entity<StockAdjustment>(entity =>
+{
+    entity.ToTable("StockAdjustments");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.AdjustmentNumber)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.AdjustmentNumber)
+        .IsUnique();
+
+    entity.Property(x => x.AdjustmentDate)
+        .IsRequired();
+
+    entity.Property(x => x.AdjustmentType)
+        .IsRequired()
+        .HasMaxLength(30);
+
+    entity.Property(x => x.ReferenceNumber)
+        .HasMaxLength(100);
+
+    entity.Property(x => x.Reason)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.TotalIncreaseQuantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TotalDecreaseQuantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TotalValue)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.Status)
+        .IsRequired()
+        .HasMaxLength(30);
+
+    entity.Property(x => x.IsPosted)
+        .IsRequired();
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.FiscalYear)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.FiscalYearPeriod)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearPeriodId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasMany(x => x.StockAdjustmentLines)
+        .WithOne(x => x.StockAdjustment)
+        .HasForeignKey(x => x.StockAdjustmentId)
+        .OnDelete(DeleteBehavior.Cascade);
+});
 
 
+// ========================================================
+        // StockAdjustmentLine
+        // ========================================================
+     modelBuilder.Entity<StockAdjustmentLine>(entity =>
+{
+    entity.ToTable("StockAdjustmentLines");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.Quantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.UnitCost)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.LineTotal)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.AdjustmentType)
+        .IsRequired()
+        .HasMaxLength(30);
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.LineNumber)
+        .IsRequired();
+
+    entity.HasIndex(x => new
+    {
+        x.StockAdjustmentId,
+        x.LineNumber
+    })
+    .IsUnique();
+
+    entity.HasOne(x => x.StockAdjustment)
+        .WithMany(x => x.StockAdjustmentLines)
+        .HasForeignKey(x => x.StockAdjustmentId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    entity.HasOne(x => x.Product)
+        .WithMany()
+        .HasForeignKey(x => x.ProductId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+  //========================================================
+        // StockTransfer
+        // ========================================================
+modelBuilder.Entity<StockTransfer>(entity =>
+{
+    entity.ToTable("StockTransfers");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.TransferNumber)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.TransferNumber)
+        .IsUnique();
+
+    entity.Property(x => x.TransferDate)
+        .IsRequired();
+
+    entity.Property(x => x.ReferenceNumber)
+        .HasMaxLength(100);
+
+    entity.Property(x => x.Reason)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.TotalQuantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TotalValue)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.Status)
+        .IsRequired()
+        .HasMaxLength(30);
+
+    entity.Property(x => x.IsPosted)
+        .IsRequired();
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.FiscalYear)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.FiscalYearPeriod)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearPeriodId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasMany(x => x.StockTransferLines)
+        .WithOne(x => x.StockTransfer)
+        .HasForeignKey(x => x.StockTransferId)
+        .OnDelete(DeleteBehavior.Cascade);
+});
+
+// ========================================================
+        // StockTransferLine
+        // ========================================================
+        modelBuilder.Entity<StockTransferLine>(entity =>
+{
+    entity.ToTable("StockTransferLines");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.Quantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.UnitCost)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.LineTotal)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.LineNumber)
+        .IsRequired();
+
+    entity.HasIndex(x => new
+    {
+        x.StockTransferId,
+        x.LineNumber
+    })
+    .IsUnique();
+
+    entity.HasOne(x => x.StockTransfer)
+        .WithMany(x => x.StockTransferLines)
+        .HasForeignKey(x => x.StockTransferId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    entity.HasOne(x => x.Product)
+        .WithMany()
+        .HasForeignKey(x => x.ProductId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+
+// ========================================================
+        // StockCount
+        // ========================================================
+       modelBuilder.Entity<StockCount>(entity =>
+{
+    entity.ToTable("StockCounts");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.CountNumber)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.CountNumber)
+        .IsUnique();
+
+    entity.Property(x => x.CountDate)
+        .IsRequired();
+
+    entity.Property(x => x.ReferenceNumber)
+        .HasMaxLength(100);
+
+    entity.Property(x => x.Reason)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.TotalSystemQuantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TotalCountedQuantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TotalDifferenceQuantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TotalDifferenceValue)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.Status)
+        .IsRequired()
+        .HasMaxLength(30);
+
+    entity.Property(x => x.IsPosted)
+        .IsRequired();
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.FiscalYear)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.FiscalYearPeriod)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearPeriodId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasMany(x => x.StockCountLines)
+        .WithOne(x => x.StockCount)
+        .HasForeignKey(x => x.StockCountId)
+        .OnDelete(DeleteBehavior.Cascade);
+});
+
+// ========================================================
+        // StockCountLine
+        // ========================================================
+       modelBuilder.Entity<StockCountLine>(entity =>
+{
+    entity.ToTable("StockCountLines");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.SystemQuantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.CountedQuantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.DifferenceQuantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.UnitCost)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.DifferenceValue)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.LineNumber)
+        .IsRequired();
+
+    entity.HasIndex(x => new
+    {
+        x.StockCountId,
+        x.LineNumber
+    })
+    .IsUnique();
+
+    entity.HasOne(x => x.StockCount)
+        .WithMany(x => x.StockCountLines)
+        .HasForeignKey(x => x.StockCountId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    entity.HasOne(x => x.Product)
+        .WithMany()
+        .HasForeignKey(x => x.ProductId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+
+// ========================================================
+        // StockOpening
+        // ========================================================
+       modelBuilder.Entity<StockOpening>(entity =>
+{
+    entity.ToTable("StockOpenings");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.OpeningNumber)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.OpeningNumber)
+        .IsUnique();
+
+    entity.Property(x => x.OpeningDate)
+        .IsRequired();
+
+    entity.Property(x => x.ReferenceNumber)
+        .HasMaxLength(100);
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.TotalQuantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TotalValue)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.Status)
+        .IsRequired()
+        .HasMaxLength(30);
+
+    entity.Property(x => x.IsPosted)
+        .IsRequired();
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasOne(x => x.FiscalYear)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasOne(x => x.FiscalYearPeriod)
+        .WithMany()
+        .HasForeignKey(x => x.FiscalYearPeriodId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasMany(x => x.StockOpeningLines)
+        .WithOne(x => x.StockOpening)
+        .HasForeignKey(x => x.StockOpeningId)
+        .OnDelete(DeleteBehavior.Cascade);
+});
+
+// ========================================================
+        // StockOpeningLine
+        // ========================================================
+       modelBuilder.Entity<StockOpeningLine>(entity =>
+{
+    entity.ToTable("StockOpeningLines");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.Quantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.UnitCost)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.TotalCost)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.LineNumber)
+        .IsRequired();
+
+    entity.HasIndex(x => new
+    {
+        x.StockOpeningId,
+        x.LineNumber
+    })
+    .IsUnique();
+
+    entity.HasOne(x => x.StockOpening)
+        .WithMany(x => x.StockOpeningLines)
+        .HasForeignKey(x => x.StockOpeningId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    entity.HasOne(x => x.Product)
+        .WithMany()
+        .HasForeignKey(x => x.ProductId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
 
     }
 }

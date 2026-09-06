@@ -4,6 +4,7 @@ using BIZ.Infrastructure.Persistence.Tenant;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
 {
     [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260905174730_AddStockCount")]
+    partial class AddStockCount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -4565,125 +4568,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                     b.ToTable("StockCountLines", (string)null);
                 });
 
-            modelBuilder.Entity("BIZ.Domain.Entities.StockOpening", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("BranchId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("FiscalYearId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FiscalYearPeriodId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPosted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("OpeningDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("OpeningNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime?>("PostedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ReferenceNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<decimal>("TotalQuantity")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<decimal>("TotalValue")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("WarehouseId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FiscalYearId");
-
-                    b.HasIndex("FiscalYearPeriodId");
-
-                    b.HasIndex("OpeningNumber")
-                        .IsUnique();
-
-                    b.ToTable("StockOpenings", (string)null);
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.StockOpeningLine", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("LineNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Quantity")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<int>("StockOpeningId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalCost")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.Property<decimal>("UnitCost")
-                        .HasPrecision(18, 8)
-                        .HasColumnType("decimal(18,8)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("StockOpeningId", "LineNumber")
-                        .IsUnique();
-
-                    b.ToTable("StockOpeningLines", (string)null);
-                });
-
             modelBuilder.Entity("BIZ.Domain.Entities.StockTransaction", b =>
                 {
                     b.Property<int>("Id")
@@ -6339,44 +6223,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
                     b.Navigation("StockCount");
                 });
 
-            modelBuilder.Entity("BIZ.Domain.Entities.StockOpening", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.FiscalYear", "FiscalYear")
-                        .WithMany()
-                        .HasForeignKey("FiscalYearId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.FiscalYearPeriod", "FiscalYearPeriod")
-                        .WithMany()
-                        .HasForeignKey("FiscalYearPeriodId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("FiscalYear");
-
-                    b.Navigation("FiscalYearPeriod");
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.StockOpeningLine", b =>
-                {
-                    b.HasOne("BIZ.Domain.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BIZ.Domain.Entities.StockOpening", "StockOpening")
-                        .WithMany("StockOpeningLines")
-                        .HasForeignKey("StockOpeningId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("StockOpening");
-                });
-
             modelBuilder.Entity("BIZ.Domain.Entities.StockTransaction", b =>
                 {
                     b.HasOne("BIZ.Domain.Entities.FiscalYear", "FiscalYear")
@@ -6626,11 +6472,6 @@ namespace BIZ.Infrastructure.Persistence.Migrations.Tenant
             modelBuilder.Entity("BIZ.Domain.Entities.StockCount", b =>
                 {
                     b.Navigation("StockCountLines");
-                });
-
-            modelBuilder.Entity("BIZ.Domain.Entities.StockOpening", b =>
-                {
-                    b.Navigation("StockOpeningLines");
                 });
 
             modelBuilder.Entity("BIZ.Domain.Entities.StockTransfer", b =>
