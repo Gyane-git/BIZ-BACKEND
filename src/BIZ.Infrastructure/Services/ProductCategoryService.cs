@@ -22,6 +22,7 @@ public class ProductCategoryService : IProductCategoryService
             .OrderBy(x => x.Name)
             .Select(x => new ProductCategoryDto
             {
+                Id = x.Id,
                 Code = x.Code,
                 Name = x.Name,
                 Description = x.Description,
@@ -37,6 +38,7 @@ public class ProductCategoryService : IProductCategoryService
             .Where(x => x.Id == id)
             .Select(x => new ProductCategoryDto
             {
+                Id = x.Id,
                 Code = x.Code,
                 Name = x.Name,
                 Description = x.Description,
@@ -68,6 +70,7 @@ public class ProductCategoryService : IProductCategoryService
         await _db.SaveChangesAsync();
 
         dto.Code = entity.Code;
+        dto.Id = entity.Id;
 
         return dto;
     }

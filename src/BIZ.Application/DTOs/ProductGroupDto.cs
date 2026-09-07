@@ -2,6 +2,8 @@ namespace BIZ.Application.DTOs;
 
 public class ProductGroupDto
 {
+    public int Id { get; set; }
+
     public string Code { get; set; } = string.Empty;
 
     public string Name { get; set; } = string.Empty;

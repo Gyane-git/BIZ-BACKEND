@@ -22,6 +22,7 @@ public class ProductSubGroupService : IProductSubGroupService
             .OrderBy(x => x.Name)
             .Select(x => new ProductSubGroupDto
             {
+                Id = x.Id,
                 ProductGroupId = x.ProductGroupId,
                 Code = x.Code,
                 Name = x.Name,
@@ -40,6 +41,7 @@ public class ProductSubGroupService : IProductSubGroupService
             .OrderBy(x => x.Name)
             .Select(x => new ProductSubGroupDto
             {
+                Id = x.Id,
                 ProductGroupId = x.ProductGroupId,
                 Code = x.Code,
                 Name = x.Name,
@@ -56,6 +58,7 @@ public class ProductSubGroupService : IProductSubGroupService
             .Where(x => x.Id == id)
             .Select(x => new ProductSubGroupDto
             {
+                Id = x.Id,
                 ProductGroupId = x.ProductGroupId,
                 Code = x.Code,
                 Name = x.Name,
@@ -104,6 +107,7 @@ public class ProductSubGroupService : IProductSubGroupService
 
         return new ProductSubGroupDto
         {
+            Id = entity.Id,
             ProductGroupId = entity.ProductGroupId,
             Code = entity.Code,
             Name = entity.Name,
