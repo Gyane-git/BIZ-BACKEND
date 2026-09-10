@@ -149,12 +149,6 @@ public class ProductBatchService : IProductBatchService
     {
         dto.BatchNumber = dto.BatchNumber.Trim();
 
-        if (string.IsNullOrWhiteSpace(dto.BatchNumber))
-        {
-            throw new InvalidOperationException(
-                "BatchNumber is required.");
-        }
-
         var productExists = await _db.Products
             .AnyAsync(x =>
                 x.Id == dto.ProductId &&
@@ -165,6 +159,19 @@ public class ProductBatchService : IProductBatchService
             throw new InvalidOperationException(
                 $"Product with ID {dto.ProductId} was not found or inactive.");
         }
+
+        var productCode = await _db.Products
+            .Where(x => x.Id == dto.ProductId)
+            .Select(x => x.Code)
+            .FirstAsync();
+
+        dto.BatchNumber = string.IsNullOrWhiteSpace(dto.BatchNumber)
+            ? await CodeGenerator.NextAsync(
+                _db.ProductBatches
+                    .Where(x => x.ProductId == dto.ProductId)
+                    .Select(x => x.BatchNumber),
+                $"{productCode}-B")
+            : dto.BatchNumber.Trim();
 
         if (dto.ProductVariantId.HasValue)
         {

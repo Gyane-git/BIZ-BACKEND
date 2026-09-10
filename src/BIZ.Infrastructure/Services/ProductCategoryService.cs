@@ -49,16 +49,16 @@ public class ProductCategoryService : IProductCategoryService
 
     public async Task<ProductCategoryDto> CreateAsync(ProductCategoryDto dto)
     {
-        var exists = await _db.ProductCategories
-            .AnyAsync(x => x.Code == dto.Code);
+        var code = string.IsNullOrWhiteSpace(dto.Code)
+            ? await CodeGenerator.NextAsync(_db.ProductCategories.Select(x => x.Code), "CAT")
+            : dto.Code.Trim();
 
-        if (exists)
-            throw new InvalidOperationException(
-                $"Product category code '{dto.Code}' already exists.");
+        if (await _db.ProductCategories.AnyAsync(x => x.Code == code))
+            throw new InvalidOperationException($"Product category code '{code}' already exists.");
 
         var entity = new ProductCategory
         {
-            Code = dto.Code.Trim(),
+            Code = code,
             Name = dto.Name.Trim(),
             Description = dto.Description?.Trim(),
             IsActive = dto.IsActive,
@@ -69,6 +69,7 @@ public class ProductCategoryService : IProductCategoryService
 
         await _db.SaveChangesAsync();
 
+        dto.Id = entity.Id;
         dto.Code = entity.Code;
         dto.Id = entity.Id;
 

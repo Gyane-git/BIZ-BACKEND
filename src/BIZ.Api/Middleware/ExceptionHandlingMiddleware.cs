@@ -23,10 +23,13 @@ public sealed class ExceptionHandlingMiddleware
         {
             _logger.LogError(exception, "Tenant database connection failed for {Path}", context.Request.Path);
             context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+            var message = context.RequestServices.GetRequiredService<IHostEnvironment>().IsDevelopment()
+                ? $"Tenant database operation failed (SQL {exception.Number}): {exception.Message}"
+                : "Tenant database is unavailable. Check the company DatabaseServer, DatabaseName, SQL Server status, and tenant database existence.";
             await context.Response.WriteAsJsonAsync(new
             {
                 success = false,
-                message = "Tenant database is unavailable. Check the company DatabaseServer, DatabaseName, SQL Server status, and tenant database existence."
+                message
             });
         }
     }

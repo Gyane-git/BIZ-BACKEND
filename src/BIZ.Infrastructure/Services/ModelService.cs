@@ -61,19 +61,12 @@ public class ModelService : IModelService
             );
         }
 
-        var code = dto.Code.Trim();
+        var code = string.IsNullOrWhiteSpace(dto.Code)
+            ? await CodeGenerator.NextAsync(_db.Models.Select(x => x.Code), "MOD")
+            : dto.Code.Trim();
 
-        var exists = await _db.Models
-            .AnyAsync(x =>
-                x.BrandId == dto.BrandId &&
-                x.Code == code);
-
-        if (exists)
-        {
-            throw new InvalidOperationException(
-                $"Model code '{code}' already exists for this brand."
-            );
-        }
+        if (await _db.Models.AnyAsync(x => x.Code == code))
+            throw new InvalidOperationException($"Model code '{code}' already exists.");
 
         var model = new Model
         {

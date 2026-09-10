@@ -49,14 +49,12 @@ public class ProductGroupService : IProductGroupService
 
     public async Task<ProductGroupDto> CreateAsync(ProductGroupDto dto)
     {
-        var code = dto.Code.Trim();
+        var code = string.IsNullOrWhiteSpace(dto.Code)
+            ? await CodeGenerator.NextAsync(_db.ProductGroups.Select(x => x.Code), "GRP")
+            : dto.Code.Trim();
 
-        var exists = await _db.ProductGroups
-            .AnyAsync(x => x.Code == code);
-
-        if (exists)
-            throw new InvalidOperationException(
-                $"Product group code '{code}' already exists.");
+        if (await _db.ProductGroups.AnyAsync(x => x.Code == code))
+            throw new InvalidOperationException($"Product group code '{code}' already exists.");
 
         var entity = new ProductGroup
         {

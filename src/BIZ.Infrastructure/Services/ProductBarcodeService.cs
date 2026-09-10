@@ -97,12 +97,6 @@ public class ProductBarcodeService : IProductBarcodeService
     {
         dto.Barcode = dto.Barcode.Trim();
 
-        if (string.IsNullOrWhiteSpace(dto.Barcode))
-        {
-            throw new InvalidOperationException(
-                "Barcode is required.");
-        }
-
         // Check Product
         var productExists = await _db.Products
             .AnyAsync(x =>
@@ -114,6 +108,19 @@ public class ProductBarcodeService : IProductBarcodeService
             throw new InvalidOperationException(
                 $"Product with ID {dto.ProductId} was not found or is inactive.");
         }
+
+        var productCode = await _db.Products
+            .Where(x => x.Id == dto.ProductId)
+            .Select(x => x.Code)
+            .FirstAsync();
+
+        dto.Barcode = string.IsNullOrWhiteSpace(dto.Barcode)
+            ? await CodeGenerator.NextAsync(
+                _db.ProductBarcodes
+                    .Where(x => x.ProductId == dto.ProductId)
+                    .Select(x => x.Barcode),
+                $"{productCode}-BC")
+            : dto.Barcode.Trim();
 
         // Check ProductUnit if provided
         if (dto.ProductUnitId.HasValue)

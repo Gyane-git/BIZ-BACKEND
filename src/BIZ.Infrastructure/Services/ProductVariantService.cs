@@ -138,12 +138,6 @@ public class ProductVariantService : IProductVariantService
         dto.Size = dto.Size?.Trim();
         dto.Specification = dto.Specification?.Trim();
 
-        if (string.IsNullOrWhiteSpace(dto.VariantCode))
-        {
-            throw new InvalidOperationException(
-                "VariantCode is required.");
-        }
-
         if (string.IsNullOrWhiteSpace(dto.VariantName))
         {
             throw new InvalidOperationException(
@@ -160,6 +154,19 @@ public class ProductVariantService : IProductVariantService
             throw new InvalidOperationException(
                 $"Product with ID {dto.ProductId} was not found or inactive.");
         }
+
+        var productCode = await _db.Products
+            .Where(x => x.Id == dto.ProductId)
+            .Select(x => x.Code)
+            .FirstAsync();
+
+        dto.VariantCode = string.IsNullOrWhiteSpace(dto.VariantCode)
+            ? await CodeGenerator.NextAsync(
+                _db.ProductVariants
+                    .Where(x => x.ProductId == dto.ProductId)
+                    .Select(x => x.VariantCode),
+                $"{productCode}-V")
+            : dto.VariantCode.Trim();
 
         var codeExists = await _db.ProductVariants
             .AnyAsync(x =>

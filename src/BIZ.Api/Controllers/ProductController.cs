@@ -2,6 +2,7 @@ using BIZ.Application.DTOs;
 using BIZ.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BIZ.Api.Controllers;
 
@@ -96,6 +97,14 @@ public class ProductController : ControllerBase
                 message = ex.Message
             });
         }
+        catch (DbUpdateException ex)
+        {
+            return Conflict(new
+            {
+                success = false,
+                message = $"Product could not be saved: {ex.InnerException?.Message ?? ex.Message}"
+            });
+        }
     }
 
     [HttpPut("{id}")]
@@ -128,6 +137,14 @@ public class ProductController : ControllerBase
             {
                 success = false,
                 message = ex.Message
+            });
+        }
+        catch (DbUpdateException ex)
+        {
+            return Conflict(new
+            {
+                success = false,
+                message = $"Product could not be updated: {ex.InnerException?.Message ?? ex.Message}"
             });
         }
     }

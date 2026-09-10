@@ -80,16 +80,12 @@ public class ProductSubGroupService : IProductSubGroupService
             throw new InvalidOperationException(
                 "Product group not found or inactive.");
 
-        var code = dto.Code.Trim();
+        var code = string.IsNullOrWhiteSpace(dto.Code)
+            ? await CodeGenerator.NextAsync(_db.ProductSubGroups.Select(x => x.Code), "SUB")
+            : dto.Code.Trim();
 
-        var exists = await _db.ProductSubGroups
-            .AnyAsync(x =>
-                x.ProductGroupId == dto.ProductGroupId &&
-                x.Code == code);
-
-        if (exists)
-            throw new InvalidOperationException(
-                $"Product sub-group code '{code}' already exists in this group.");
+        if (await _db.ProductSubGroups.AnyAsync(x => x.Code == code))
+            throw new InvalidOperationException($"Product sub group code '{code}' already exists.");
 
         var entity = new ProductSubGroup
         {

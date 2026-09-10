@@ -49,17 +49,12 @@ public class BrandService : IBrandService
 
     public async Task<BrandDto> CreateAsync(BrandDto dto)
     {
-        var code = dto.Code.Trim();
+        var code = string.IsNullOrWhiteSpace(dto.Code)
+            ? await CodeGenerator.NextAsync(_db.Brands.Select(x => x.Code), "BRD")
+            : dto.Code.Trim();
 
-        var exists = await _db.Brands
-            .AnyAsync(x => x.Code == code);
-
-        if (exists)
-        {
-            throw new InvalidOperationException(
-                $"Brand code '{code}' already exists."
-            );
-        }
+        if (await _db.Brands.AnyAsync(x => x.Code == code))
+            throw new InvalidOperationException($"Brand code '{code}' already exists.");
 
         var brand = new Brand
         {

@@ -190,9 +190,17 @@ public class ProductService : IProductService
 
     public async Task<ProductDto> CreateAsync(ProductDto dto)
     {
-        dto.Code = dto.Code.Trim();
         dto.Name = dto.Name.Trim();
         dto.ShortName = dto.ShortName.Trim();
+        dto.Category = dto.Category?.Trim();
+        dto.ProductGroupCode = dto.ProductGroupCode?.Trim();
+        dto.ProductSubGroupCode = dto.ProductSubGroupCode?.Trim();
+
+        await ValidateClassificationAsync(dto);
+
+        dto.Code = string.IsNullOrWhiteSpace(dto.Code)
+            ? await CodeGenerator.NextAsync(_context.Products.Select(x => x.Code), "PRD")
+            : dto.Code.Trim();
 
         var codeExists = await _context.Products
             .AnyAsync(x => x.Code == dto.Code);
@@ -280,6 +288,11 @@ public class ProductService : IProductService
         dto.Code = dto.Code.Trim();
         dto.Name = dto.Name.Trim();
         dto.ShortName = dto.ShortName.Trim();
+        dto.Category = dto.Category?.Trim();
+        dto.ProductGroupCode = dto.ProductGroupCode?.Trim();
+        dto.ProductSubGroupCode = dto.ProductSubGroupCode?.Trim();
+
+        await ValidateClassificationAsync(dto);
 
         var codeExists = await _context.Products
             .AnyAsync(x =>
@@ -365,5 +378,38 @@ public class ProductService : IProductService
         await _context.SaveChangesAsync();
 
         return true;
+    }
+
+    private async Task ValidateClassificationAsync(ProductDto dto)
+    {
+        if (!string.IsNullOrWhiteSpace(dto.Category) &&
+            !await _context.ProductCategories.AnyAsync(x => x.Code == dto.Category && x.IsActive))
+        {
+            throw new InvalidOperationException("Product category was not found or is inactive.");
+        }
+
+        ProductGroup? group = null;
+        if (!string.IsNullOrWhiteSpace(dto.ProductGroupCode))
+        {
+            group = await _context.ProductGroups
+                .FirstOrDefaultAsync(x => x.Code == dto.ProductGroupCode && x.IsActive);
+
+            if (group is null)
+                throw new InvalidOperationException("Product group was not found or is inactive.");
+        }
+
+        if (!string.IsNullOrWhiteSpace(dto.ProductSubGroupCode))
+        {
+            if (group is null)
+                throw new InvalidOperationException("Select a product group before selecting a sub group.");
+
+            var subGroupExists = await _context.ProductSubGroups.AnyAsync(x =>
+                x.Code == dto.ProductSubGroupCode &&
+                x.ProductGroupId == group.Id &&
+                x.IsActive);
+
+            if (!subGroupExists)
+                throw new InvalidOperationException("Product sub group does not belong to the selected product group.");
+        }
     }
 }

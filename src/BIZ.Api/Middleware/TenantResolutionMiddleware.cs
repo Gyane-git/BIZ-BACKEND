@@ -2,12 +2,16 @@ using BIZ.Application.Interfaces;
 using BIZ.Infrastructure.Persistence.MasterRegistry;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Collections.Concurrent;
+using BIZ.Infrastructure.Persistence.Tenant;
 
 namespace BIZ.Api.Middleware;
 
 public class TenantResolutionMiddleware
 {
     private readonly RequestDelegate _next;
+    private static readonly ConcurrentDictionary<string, SemaphoreSlim> MigrationLocks = new();
+    private static readonly ConcurrentDictionary<string, byte> MigratedTenants = new();
 
     public TenantResolutionMiddleware(RequestDelegate next)
     {
@@ -156,6 +160,31 @@ var companyCodeFromToken =
             company.DatabaseServer,
             company.DatabaseName
         );
+
+        // Existing tenant databases do not run the API startup migration. Apply
+        // pending tenant migrations once when the company is first used.
+        var tenantDatabaseKey = $"{company.DatabaseServer}/{company.DatabaseName}";
+        if (!MigratedTenants.ContainsKey(tenantDatabaseKey))
+        {
+            var migrationLock = MigrationLocks.GetOrAdd(tenantDatabaseKey, _ => new SemaphoreSlim(1, 1));
+            await migrationLock.WaitAsync(context.RequestAborted);
+            try
+            {
+                if (!MigratedTenants.ContainsKey(tenantDatabaseKey))
+                {
+                    var tenantDb = context.RequestServices.GetRequiredService<TenantDbContext>();
+                    await tenantDb.Database.MigrateAsync(context.RequestAborted);
+                    await tenantDb.Database.ExecuteSqlRawAsync(
+                        "ALTER TABLE [Products] ALTER COLUMN [Category] nvarchar(50) NULL; ALTER TABLE [Products] ALTER COLUMN [ValuationMethod] nvarchar(50) NULL;",
+                        context.RequestAborted);
+                    MigratedTenants.TryAdd(tenantDatabaseKey, 0);
+                }
+            }
+            finally
+            {
+                migrationLock.Release();
+            }
+        }
 
         // ============================================================
         // Continue Request Pipeline

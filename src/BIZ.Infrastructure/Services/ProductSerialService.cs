@@ -166,12 +166,6 @@ public class ProductSerialService : IProductSerialService
         dto.Status = dto.Status.Trim();
         dto.Remarks = dto.Remarks?.Trim();
 
-        if (string.IsNullOrWhiteSpace(dto.SerialNumber))
-        {
-            throw new InvalidOperationException(
-                "SerialNumber is required.");
-        }
-
         if (string.IsNullOrWhiteSpace(dto.Status))
         {
             dto.Status = "Available";
@@ -189,6 +183,19 @@ public class ProductSerialService : IProductSerialService
             throw new InvalidOperationException(
                 $"Product with ID {dto.ProductId} was not found or inactive.");
         }
+
+        var productCode = await _db.Products
+            .Where(x => x.Id == dto.ProductId)
+            .Select(x => x.Code)
+            .FirstAsync();
+
+        dto.SerialNumber = string.IsNullOrWhiteSpace(dto.SerialNumber)
+            ? await CodeGenerator.NextAsync(
+                _db.ProductSerials
+                    .Where(x => x.ProductId == dto.ProductId)
+                    .Select(x => x.SerialNumber),
+                $"{productCode}-S")
+            : dto.SerialNumber.Trim();
 
         if (dto.ProductVariantId.HasValue)
         {

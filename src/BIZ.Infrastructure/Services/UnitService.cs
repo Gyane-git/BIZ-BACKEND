@@ -54,16 +54,16 @@ public class UnitService : IUnitService
 
     public async Task<UnitDto> CreateAsync(UnitDto dto)
     {
-        var exists = await _db.Units
-            .AnyAsync(x => x.Code == dto.Code);
+        var code = string.IsNullOrWhiteSpace(dto.Code)
+            ? await CodeGenerator.NextAsync(_db.Units.Select(x => x.Code), "UNT")
+            : dto.Code.Trim();
 
-        if (exists)
-            throw new InvalidOperationException(
-                $"Unit code '{dto.Code}' already exists.");
+        if (await _db.Units.AnyAsync(x => x.Code == code))
+            throw new InvalidOperationException($"Unit code '{code}' already exists.");
 
         var unit = new Unit
         {
-            Code = dto.Code.Trim(),
+            Code = code,
             Name = dto.Name.Trim(),
             Symbol = dto.Symbol?.Trim(),
             Description = dto.Description?.Trim(),
@@ -76,6 +76,7 @@ public class UnitService : IUnitService
         await _db.SaveChangesAsync();
 
         dto.Id = unit.Id;
+        dto.Code = unit.Code;
         dto.CreatedAt = unit.CreatedAt;
 
         return dto;

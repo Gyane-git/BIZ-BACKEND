@@ -51,6 +51,11 @@ public class TenantDbContext : DbContext
     public DbSet<ProductVariant> ProductVariants => Set<ProductVariant>();
     public DbSet<ProductBatch> ProductBatches => Set<ProductBatch>();
     public DbSet<ProductSerial> ProductSerials=> Set<ProductSerial>();
+    public DbSet<ProductScheme> ProductSchemes { get; set; }
+    public DbSet<ProductSchemeLine> ProductSchemeLines { get; set; }
+    public DbSet<ProductComposition> ProductCompositions { get; set; }
+    public DbSet<ProductCompositionLine> ProductCompositionLines { get; set; }
+    public DbSet<ValueAddedList> ValueAddedLists { get; set; }
 
     public DbSet<AccountGroup> AccountGroups => Set<AccountGroup>();
     public DbSet<AccountSubGroup> AccountSubGroups => Set<AccountSubGroup>();
@@ -753,6 +758,224 @@ modelBuilder.Entity<Supplier>(entity =>
 });
 
 
+// ========================================================
+        // ProductScheme
+        // ========================================================
+        modelBuilder.Entity<ProductScheme>(entity =>
+{
+    entity.ToTable("ProductSchemes");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.SchemeCode)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.SchemeCode)
+        .IsUnique();
+
+    entity.Property(x => x.SchemeName)
+        .IsRequired()
+        .HasMaxLength(150);
+
+    entity.Property(x => x.SchemeType)
+        .IsRequired()
+        .HasMaxLength(30);
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasMany(x => x.ProductSchemeLines)
+        .WithOne(x => x.ProductScheme)
+        .HasForeignKey(x => x.ProductSchemeId)
+        .OnDelete(DeleteBehavior.Cascade);
+});
+
+        // ========================================================
+        // ProductSchemeLine
+        // ========================================================
+        modelBuilder.Entity<ProductSchemeLine>(entity =>
+{
+    entity.ToTable("ProductSchemeLines");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.MinimumQuantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.MaximumQuantity)
+        .HasPrecision(18, 8);
+
+    entity.Property(x => x.DiscountPercent)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.DiscountAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.FreeQuantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.LineNumber)
+        .IsRequired();
+
+    entity.HasIndex(x => new
+    {
+        x.ProductSchemeId,
+        x.LineNumber
+    }).IsUnique();
+
+    entity.HasOne(x => x.ProductScheme)
+        .WithMany(x => x.ProductSchemeLines)
+        .HasForeignKey(x => x.ProductSchemeId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    entity.HasOne(x => x.Product)
+        .WithMany()
+        .HasForeignKey(x => x.ProductId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+        // ========================================================
+        // ProductComposition
+        // ========================================================
+        modelBuilder.Entity<ProductComposition>(entity =>
+{
+    entity.ToTable("ProductCompositions");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.CompositionName)
+        .IsRequired()
+        .HasMaxLength(150);
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+
+    entity.HasIndex(x => new
+    {
+        x.ProductId,
+        x.CompositionName
+    }).IsUnique();
+
+    entity.HasOne(x => x.Product)
+        .WithMany()
+        .HasForeignKey(x => x.ProductId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    entity.HasMany(x => x.ProductCompositionLines)
+        .WithOne(x => x.ProductComposition)
+        .HasForeignKey(x => x.ProductCompositionId)
+        .OnDelete(DeleteBehavior.Cascade);
+});
+
+
+        // ========================================================
+        // ProductCompositionLine
+        // ========================================================
+     modelBuilder.Entity<ProductCompositionLine>(entity =>
+{
+    entity.ToTable("ProductCompositionLines");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.ComponentName)
+        .IsRequired()
+        .HasMaxLength(150);
+
+    entity.Property(x => x.Quantity)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.Unit)
+        .HasMaxLength(30);
+
+    entity.Property(x => x.Percentage)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.LineNumber)
+        .IsRequired();
+
+    entity.HasIndex(x => new
+    {
+        x.ProductCompositionId,
+        x.LineNumber
+    }).IsUnique();
+
+    entity.HasOne(x => x.ProductComposition)
+        .WithMany(x => x.ProductCompositionLines)
+        .HasForeignKey(x => x.ProductCompositionId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    entity.HasOne(x => x.ComponentProduct)
+        .WithMany()
+        .HasForeignKey(x => x.ComponentProductId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+ // ========================================================
+        // ValueAddedList
+        // ========================================================
+       modelBuilder.Entity<ValueAddedList>(entity =>
+{
+    entity.ToTable("ValueAddedLists");
+
+    entity.HasKey(x => x.Id);
+
+    entity.Property(x => x.Code)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    entity.HasIndex(x => x.Code)
+        .IsUnique();
+
+    entity.Property(x => x.Name)
+        .IsRequired()
+        .HasMaxLength(150);
+
+    entity.Property(x => x.Description)
+        .HasMaxLength(500);
+
+    entity.Property(x => x.DefaultAmount)
+        .HasPrecision(18, 8)
+        .IsRequired();
+
+    entity.Property(x => x.AmountType)
+        .IsRequired()
+        .HasMaxLength(20);
+
+    entity.Property(x => x.IsActive)
+        .IsRequired();
+
+    entity.Property(x => x.CreatedAt)
+        .IsRequired();
+});
+
+
+
+
    // ========================================================
    // Agent
    // ========================================================
@@ -1041,10 +1264,10 @@ modelBuilder.Entity<WarehouseLocation>(entity =>
 
     // Classification
     entity.Property(x => x.Category)
-        .HasMaxLength(1);
+        .HasMaxLength(50);
 
     entity.Property(x => x.ValuationMethod)
-        .HasMaxLength(1);
+        .HasMaxLength(50);
 
     entity.Property(x => x.ProductGroupCode)
         .HasMaxLength(15);
