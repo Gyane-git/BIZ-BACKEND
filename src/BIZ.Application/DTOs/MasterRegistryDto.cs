@@ -17,11 +17,26 @@ public sealed class UserRequest
     public string Username { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
+    public int? RoleId { get; set; }
 }
 
 public sealed class UserStatusRequest
 {
     public bool IsActive { get; set; }
+}
+
+public sealed class UserUpdateRequest
+{
+    public int CompanyId { get; set; }
+    public string Username { get; set; } = string.Empty;
+    public string FullName { get; set; } = string.Empty;
+    public int? RoleId { get; set; }
+    public bool IsActive { get; set; } = true;
+}
+
+public sealed class UserPasswordResetRequest
+{
+    public string Password { get; set; } = string.Empty;
 }
 
 public sealed class RoleRequest

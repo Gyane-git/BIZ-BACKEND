@@ -12,11 +12,15 @@ public interface IMasterRegistryService
     Task<bool> ProvisionCompanyAsync(int id);
     Task<List<MasterRegistryUserDto>> GetUsersAsync(int? companyId = null);
     Task<MasterRegistryUserDto> CreateUserAsync(UserRequest request);
+    Task<bool> UpdateUserAsync(int id, UserUpdateRequest request);
+    Task<bool> ResetUserPasswordAsync(int id, UserPasswordResetRequest request);
     Task<bool> SetUserStatusAsync(int id, bool isActive);
     Task<List<Role>> GetRolesAsync();
     Task<Role> CreateRoleAsync(RoleRequest request);
     Task<List<Permission>> GetPermissionsAsync();
     Task<Permission> CreatePermissionAsync(PermissionRequest request);
+    Task<List<Permission>> GetRolePermissionsAsync(int roleId);
+    Task<List<Permission>> SyncSystemPermissionsAsync();
     Task<bool> AssignRoleAsync(UserRoleRequest request);
     Task<bool> RemoveRoleAsync(UserRoleRequest request);
     Task<bool> AssignPermissionAsync(RolePermissionRequest request);

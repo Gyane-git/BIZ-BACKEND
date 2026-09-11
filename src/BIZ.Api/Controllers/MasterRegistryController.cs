@@ -35,6 +35,12 @@ public sealed class MasterRegistryController : ControllerBase
     [HttpPost("users")]
     public async Task<IActionResult> CreateUser(UserRequest request) => await Execute(() => _service.CreateUserAsync(request));
 
+    [HttpPut("users/{id:int}")]
+    public async Task<IActionResult> UpdateUser(int id, UserUpdateRequest request) => await Execute(() => _service.UpdateUserAsync(id, request));
+
+    [HttpPatch("users/{id:int}/password")]
+    public async Task<IActionResult> ResetUserPassword(int id, UserPasswordResetRequest request) => await Execute(() => _service.ResetUserPasswordAsync(id, request));
+
     [HttpPatch("users/{id:int}/status")]
     public async Task<IActionResult> UserStatus(int id, UserStatusRequest request) => await Execute(() => _service.SetUserStatusAsync(id, request.IsActive));
 
@@ -49,6 +55,12 @@ public sealed class MasterRegistryController : ControllerBase
 
     [HttpPost("permissions")]
     public async Task<IActionResult> CreatePermission(PermissionRequest request) => await Execute(() => _service.CreatePermissionAsync(request));
+
+    [HttpGet("roles/{roleId:int}/permissions")]
+    public async Task<IActionResult> RolePermissions(int roleId) => Ok(await _service.GetRolePermissionsAsync(roleId));
+
+    [HttpPost("permissions/sync-system")]
+    public async Task<IActionResult> SyncSystemPermissions() => Ok(await _service.SyncSystemPermissionsAsync());
 
     [HttpPost("user-roles")]
     public async Task<IActionResult> AssignRole(UserRoleRequest request) => await Execute(() => _service.AssignRoleAsync(request));

@@ -2,6 +2,7 @@ using BIZ.Application.DTOs;
 using BIZ.Application.Interfaces;
 using BIZ.Domain.Entities;
 using BIZ.Infrastructure.Persistence.MasterRegistry;
+using BIZ.Infrastructure.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -101,6 +102,8 @@ public sealed class MasterRegistryService : IMasterRegistryService
         var username = Required(request.Username, "Username").ToLowerInvariant();
         if (!await _db.Companies.AnyAsync(x => x.Id == request.CompanyId && x.IsActive))
             throw new ArgumentException("Active company not found.");
+        if (request.RoleId.HasValue && !await _db.Roles.AnyAsync(x => x.Id == request.RoleId.Value && x.IsActive))
+            throw new ArgumentException("Active role not found.");
         if (await _db.Users.AnyAsync(x => x.CompanyId == request.CompanyId && x.Username == username))
             throw new InvalidOperationException("Username already exists in this company.");
 
@@ -113,6 +116,11 @@ public sealed class MasterRegistryService : IMasterRegistryService
         };
         _db.Users.Add(user);
         await _db.SaveChangesAsync();
+        if (request.RoleId.HasValue)
+        {
+            _db.UserRoles.Add(new UserRole { UserId = user.Id, RoleId = request.RoleId.Value, CreatedAt = DateTime.UtcNow });
+            await _db.SaveChangesAsync();
+        }
         return (await GetUsersAsync(request.CompanyId)).Single(x => x.Id == user.Id);
     }
 
@@ -121,6 +129,41 @@ public sealed class MasterRegistryService : IMasterRegistryService
         var user = await _db.Users.FirstOrDefaultAsync(x => x.Id == id);
         if (user == null) return false;
         user.IsActive = isActive;
+        user.UpdatedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> UpdateUserAsync(int id, UserUpdateRequest request)
+    {
+        var user = await _db.Users.FirstOrDefaultAsync(x => x.Id == id);
+        if (user == null) return false;
+        var username = Required(request.Username, "Username").ToLowerInvariant();
+        if (!await _db.Companies.AnyAsync(x => x.Id == request.CompanyId && x.IsActive))
+            throw new ArgumentException("Active company not found.");
+        if (request.RoleId.HasValue && !await _db.Roles.AnyAsync(x => x.Id == request.RoleId.Value && x.IsActive))
+            throw new ArgumentException("Active role not found.");
+        if (await _db.Users.AnyAsync(x => x.Id != id && x.CompanyId == request.CompanyId && x.Username == username))
+            throw new InvalidOperationException("Username already exists in this company.");
+
+        user.CompanyId = request.CompanyId;
+        user.Username = username;
+        user.FullName = Required(request.FullName, "Full name");
+        user.IsActive = request.IsActive;
+        user.UpdatedAt = DateTime.UtcNow;
+        var existingRoles = await _db.UserRoles.Where(x => x.UserId == id).ToListAsync();
+        _db.UserRoles.RemoveRange(existingRoles);
+        if (request.RoleId.HasValue)
+            _db.UserRoles.Add(new UserRole { UserId = id, RoleId = request.RoleId.Value, CreatedAt = DateTime.UtcNow });
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> ResetUserPasswordAsync(int id, UserPasswordResetRequest request)
+    {
+        var user = await _db.Users.FirstOrDefaultAsync(x => x.Id == id);
+        if (user == null) return false;
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(Required(request.Password, "Password"));
         user.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync();
         return true;
@@ -137,6 +180,34 @@ public sealed class MasterRegistryService : IMasterRegistryService
     }
 
     public Task<List<Permission>> GetPermissionsAsync() => _db.Permissions.AsNoTracking().OrderBy(x => x.Code).ToListAsync();
+
+    public Task<List<Permission>> GetRolePermissionsAsync(int roleId) =>
+        _db.RolePermissions.AsNoTracking()
+            .Where(x => x.RoleId == roleId && x.Permission.IsActive)
+            .Select(x => x.Permission)
+            .OrderBy(x => x.Code)
+            .ToListAsync();
+
+    public async Task<List<Permission>> SyncSystemPermissionsAsync()
+    {
+        var existing = await _db.Permissions.ToDictionaryAsync(x => x.Code);
+        foreach (var item in SystemPermissionCatalog.All)
+        {
+            if (existing.ContainsKey(item.Code)) continue;
+            var permission = new Permission
+            {
+                Code = item.Code,
+                Name = item.Name,
+                Description = item.Description,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
+            _db.Permissions.Add(permission);
+            existing[item.Code] = permission;
+        }
+        await _db.SaveChangesAsync();
+        return existing.Values.OrderBy(x => x.Code).ToList();
+    }
 
     public async Task<Permission> CreatePermissionAsync(PermissionRequest request)
     {

@@ -121,13 +121,21 @@ public class AuthService : IAuthService
             .Select(x => x.Role.Code)
             .ToListAsync();
 
+        var permissions = await _db.RolePermissions
+            .Where(x => x.Role.IsActive && x.Permission.IsActive &&
+                        _db.UserRoles.Any(ur => ur.UserId == user.Id && ur.RoleId == x.RoleId))
+            .Select(x => x.Permission.Code)
+            .Distinct()
+            .ToListAsync();
+
         var token = _jwtService.GenerateToken(
             user.Id,
             user.Username,
             company.Id,
             company.Code,
             company.Name,
-            roles);
+            roles,
+            permissions);
 
         var refreshToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
         _db.RefreshTokens.Add(new BIZ.Domain.Entities.RefreshToken
@@ -183,7 +191,11 @@ public class AuthService : IAuthService
             throw new UnauthorizedAccessException("Refresh token is invalid or expired.");
 
         var roles = await _db.UserRoles.Where(x => x.UserId == stored.UserId && x.Role.IsActive).Select(x => x.Role.Code).ToListAsync();
-        var accessToken = _jwtService.GenerateToken(stored.User.Id, stored.User.Username, stored.User.Company.Id, stored.User.Company.Code, stored.User.Company.Name, roles);
+        var permissions = await _db.RolePermissions
+            .Where(x => x.Role.IsActive && x.Permission.IsActive &&
+                        _db.UserRoles.Any(ur => ur.UserId == stored.UserId && ur.RoleId == x.RoleId))
+            .Select(x => x.Permission.Code).Distinct().ToListAsync();
+        var accessToken = _jwtService.GenerateToken(stored.User.Id, stored.User.Username, stored.User.Company.Id, stored.User.Company.Code, stored.User.Company.Name, roles, permissions);
         var replacement = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
         stored.RevokedAt = DateTime.UtcNow;
         stored.ReplacedByTokenHash = Hash(replacement);

@@ -22,7 +22,8 @@ public class JwtService : IJwtService
         int companyId,
         string companyCode,
         string companyName,
-        IEnumerable<string>? roles = null)
+        IEnumerable<string>? roles = null,
+        IEnumerable<string>? permissions = null)
     {
         var jwtKey = _configuration["Jwt:Key"];
 
@@ -56,6 +57,9 @@ if (int.TryParse(
 
         if (roles != null)
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+        if (permissions != null)
+            claims.AddRange(permissions.Distinct().Select(permission => new Claim("permission", permission)));
 
         var key = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(jwtKey));

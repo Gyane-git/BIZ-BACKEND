@@ -62,6 +62,7 @@ builder.Services
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(jwtKey)
             ),
+            RoleClaimType = System.Security.Claims.ClaimTypes.Role,
 
             ClockSkew = TimeSpan.Zero
         };

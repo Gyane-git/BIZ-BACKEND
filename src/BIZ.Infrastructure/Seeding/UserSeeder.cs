@@ -1,5 +1,6 @@
 using BIZ.Domain.Entities;
 using BIZ.Infrastructure.Persistence.MasterRegistry;
+using BIZ.Infrastructure.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 namespace BIZ.Infrastructure.Seeding;
@@ -42,6 +43,48 @@ public static class UserSeeder
             db.Roles.Add(adminRole);
             await db.SaveChangesAsync();
         }
+
+        if (!await db.Roles.AnyAsync(x => x.Code == "COMPANY_ADMIN"))
+        {
+            db.Roles.Add(new Role
+            {
+                Code = "COMPANY_ADMIN",
+                Name = "Company Administrator",
+                Description = "Manage users and operational permissions inside the assigned company. No BIZ registry access.",
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            });
+            await db.SaveChangesAsync();
+        }
+
+        foreach (var item in SystemPermissionCatalog.All)
+        {
+            var permission = await db.Permissions.FirstOrDefaultAsync(x => x.Code == item.Code);
+            if (permission == null)
+            {
+                permission = new Permission
+                {
+                    Code = item.Code,
+                    Name = item.Name,
+                    Description = item.Description,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow
+                };
+                db.Permissions.Add(permission);
+                await db.SaveChangesAsync();
+            }
+
+            if (!await db.RolePermissions.AnyAsync(x => x.RoleId == adminRole.Id && x.PermissionId == permission.Id))
+            {
+                db.RolePermissions.Add(new RolePermission
+                {
+                    RoleId = adminRole.Id,
+                    PermissionId = permission.Id,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+        }
+        await db.SaveChangesAsync();
 
         if (existingUser != null)
         {
